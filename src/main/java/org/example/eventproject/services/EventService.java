@@ -1,8 +1,8 @@
-package org.example.eventsoftware.services;
+package org.example.eventproject.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.eventsoftware.Repositories.EventRepository;
-import org.example.eventsoftware.models.Events;
+import org.example.eventproject.repositories.EventRepository;
+import org.example.eventproject.models.Events;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

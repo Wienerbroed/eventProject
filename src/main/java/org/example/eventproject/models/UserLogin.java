@@ -1,4 +1,4 @@
-package org.example.eventsoftware.models;
+package org.example.eventproject.models;
 
 
 import jakarta.persistence.*;

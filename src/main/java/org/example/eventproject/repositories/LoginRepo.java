@@ -1,4 +1,4 @@
-package org.example.eventsoftware.Repositories;
+package org.example.eventproject.repositories;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

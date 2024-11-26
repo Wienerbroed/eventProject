@@ -1,12 +1,11 @@
-package org.example.eventsoftware.Repositories;
+package org.example.eventproject.repositories;
 
-import org.example.eventsoftware.models.EventExpenses;
-import org.example.eventsoftware.models.EventRequirements;
-import org.example.eventsoftware.models.EventSchedule;
-import org.example.eventsoftware.models.Events;
+import org.example.eventproject.models.EventExpenses;
+import org.example.eventproject.models.EventRequirements;
+import org.example.eventproject.models.EventSchedule;
+import org.example.eventproject.models.Events;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

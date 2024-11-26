@@ -1,6 +1,6 @@
-package org.example.eventsoftware.controllers;
+package org.example.eventproject.controllers;
 
-import org.example.eventsoftware.services.LoginService;
+import org.example.eventproject.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

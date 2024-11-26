@@ -1,7 +1,7 @@
-package org.example.eventsoftware.services;
+package org.example.eventproject.services;
 
 
-import org.example.eventsoftware.Repositories.LoginRepo;
+import org.example.eventproject.repositories.LoginRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

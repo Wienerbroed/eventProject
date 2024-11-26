@@ -1,6 +1,7 @@
-package org.example.eventsoftware.models;
+package org.example.eventproject.models;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 

@@ -1,10 +1,9 @@
-package org.example.eventsoftware.controllers;
+package org.example.eventproject.controllers;
 
-import org.example.eventsoftware.models.Events;
-import org.example.eventsoftware.services.EventService;
+import org.example.eventproject.models.Events;
+import org.example.eventproject.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
