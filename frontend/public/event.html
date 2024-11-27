@@ -2,10 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+        }
+        #eventsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 2rem;
+        }
+        .event {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: calc(33% - 2rem);
+        }
+        .event h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #4CAF50;
+        }
+        .event p {
+            margin: 0.5rem 0;
+        }
+    </style>
 </head>
 <body>
-<h1>All Events</h1>
+<header>
+    <h1>All Events</h1>
+</header>
 <div id="eventsContainer"></div>
 
 <script>
@@ -28,22 +68,18 @@
 
         events.forEach(event => {
             const eventElement = document.createElement('div');
+            eventElement.classList.add('event');
             eventElement.innerHTML = `
                     <h2>${event.title}</h2>
-                    <p>${event.eventCreator}</p>
-                    <p>${event.eventResponsible}</p>
-                    <p>${event.eventControl}</p>
-                    <p>${event.eventType}</p>
-                    <p>${event.description}</p>
-                    <p>${event.maxParticipants}</p>
-                    <p>${event.maxAudience}</p>
-                    <p>${event.conguideDk}</p>
-                    <p>${event.conguideEn}</p>
-
-
-
-
-
+                    <p><strong>Creator:</strong> ${event.eventCreator}</p>
+                    <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
+                    <p><strong>Control:</strong> ${event.eventControl}</p>
+                    <p><strong>Type:</strong> ${event.eventType}</p>
+                    <p><strong>Description:</strong> ${event.description}</p>
+                    <p><strong>Max Participants:</strong> ${event.maxParticipants}</p>
+                    <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
+                    <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
+                    <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
                 `;
             eventsContainer.appendChild(eventElement);
         });
