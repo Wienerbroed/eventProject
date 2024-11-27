@@ -69,7 +69,7 @@
 
       if (response.ok) {
         alert('Event added successfully!');
-        window.location.reload(); // Optionally reload or redirect
+        window.location.href = 'event.html'; // Redirect to events page
       } else {
         alert('Failed to add event.');
       }
@@ -78,6 +78,7 @@
       alert('An error occurred.');
     }
   });
+
 </script>
 </body>
 </html>
