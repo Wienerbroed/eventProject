@@ -34,6 +34,12 @@ app.get('/events/add', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'addEvent.html'));
 });
 
+// Serve `seeEvent.html` at the `/events/:id` route
+app.get('/events/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'seeEvent.html'));
+});
+
+
 // Fetch events from the backend API
 app.get('/api/events', async (req, res) => {
     try {
