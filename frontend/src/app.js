@@ -74,3 +74,18 @@ app.post('/api/events/add', async (req, res) => {
         res.status(500).send('Error adding activity: ' + error.message);
     }
 });
+// Delete an event
+app.delete('/api/events/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/${eventId}`, { method: 'DELETE' });
+
+        if (deleteResponse.ok) {
+            res.status(204).send('Event deleted successfully.');
+        } else {
+            res.status(deleteResponse.status).send('Failed to delete event: ' + deleteResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error deleting event: ' + error.message);
+    }
+});
