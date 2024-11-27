@@ -1,5 +1,6 @@
 package org.example.eventproject.repositories;
 
+import org.example.eventproject.models.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -38,5 +39,11 @@ public class LoginRepo {
         String query = "SELECT COUNT(*) FROM login WHERE username = ?";
         Integer count = jdbcTemplate.queryForObject(query, Integer.class, username);
         return count != null && count > 0;
+    }
+
+    // method to update the user's role
+    public void updateUserRole(String username, Role newRole) {
+        String updateQuery = "UPDATE login SET role = ? WHERE username = ?";
+        jdbcTemplate.update(updateQuery, newRole.name(), username);
     }
 }
