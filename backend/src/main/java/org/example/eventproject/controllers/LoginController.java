@@ -3,6 +3,7 @@ package org.example.eventproject.controllers;
 import org.example.eventproject.models.Role;
 import org.example.eventproject.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,10 +49,8 @@ public class LoginController {
     }
 
     @PostMapping("/admin/delegate-role")
+    @PreAuthorize("hasRole('ADMIN')")
     public String delegateRole(@RequestParam String username, @RequestParam Role role) {
-        // Only allow ADMINs to change roles
-        // You can implement an additional check here for the current user's role
-        // if they are an ADMIN, or use a security context to check
         loginService.changeUserRole(username, role);
         return "redirect:/admin/dashboard";
     }
