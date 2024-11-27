@@ -37,7 +37,7 @@
             const eventElement = document.createElement('div');
             eventElement.classList.add('event');
             eventElement.innerHTML = `
-                <h2 onclick="window.location.href='seeEvent.html?id=${event.id}'">${event.title}</h2>
+                <h2 onclick="window.location.href='seeEvent.html?id=${event.eventId}'">${event.title}</h2>
                 <p><strong>Creator:</strong> ${event.eventCreator}</p>
                 <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
                 <p><strong>Control:</strong> ${event.eventControl}</p>

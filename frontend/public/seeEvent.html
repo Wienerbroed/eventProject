@@ -2,9 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<header>
+    <h1>Event Details</h1>
+</header>
+<div id="eventDetailsContainer"></div>
 
+<script>
+    async function fetchEventDetails(eventId) {
+        try {
+            const response = await fetch(`http://localhost:3000/api/events/${eventId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch event details');
+            }
+            const event = await response.json();
+            displayEventDetails(event);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function displayEventDetails(event) {
+        const eventDetailsContainer = document.getElementById('eventDetailsContainer');
+        eventDetailsContainer.innerHTML = `
+            <h2>${event.title}</h2>
+            <p><strong>Creator:</strong> ${event.eventCreator}</p>
+            <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
+            <p><strong>Control:</strong> ${event.eventControl}</p>
+            <p><strong>Type:</strong> ${event.eventType}</p>
+            <p><strong>Description:</strong> ${event.description}</p>
+            <p><strong>Max Participants:</strong> ${event.maxParticipants}</p>
+            <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
+            <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
+            <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
+        `;
+    }
+
+    // Get the event ID from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('id');
+
+    // Fetch and display event details when the page loads
+    if (eventId) {
+        fetchEventDetails(eventId);
+    } else {
+        console.error('Event ID not found in URL');
+    }
+</script>
 </body>
 </html>
