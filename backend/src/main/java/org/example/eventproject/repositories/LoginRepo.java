@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LoginRepo {
 
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -15,17 +14,19 @@ public class LoginRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    public void registerUser(String username, String password, String email) {
+        // First, check if username or email already exists
+        if (existsByUsername(username)) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
 
-    public void registerUser(String username, String password, String email, String role) {
-        String insertQuery = "INSERT INTO login (username, password, email, role) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(insertQuery, username, password, email, role);
+        // Insert new user with default USER role
+        String insertQuery = "INSERT INTO login (username, password, email, role) VALUES (?, ?, ?, 'USER')";
+        jdbcTemplate.update(insertQuery, username, password, email);
     }
-
-    public void loginUser(String username, String password) {
-        String insertQuery = "INSERT INTO login (username, password) VALUES (?, ?)";
-        jdbcTemplate.update(insertQuery, username, password);
-    }
-
 
     public boolean isValidUser(String username, String password) {
         String sql = "SELECT COUNT(*) FROM login WHERE username = ? AND password = ?";
@@ -33,10 +34,15 @@ public class LoginRepo {
         return count != null && count > 0;
     }
 
-
     public boolean existsByUsername(String username) {
         String query = "SELECT COUNT(*) FROM login WHERE username = ?";
         Integer count = jdbcTemplate.queryForObject(query, Integer.class, username);
+        return count != null && count > 0;
+    }
+
+    public boolean existsByEmail(String email) {
+        String query = "SELECT COUNT(*) FROM login WHERE email = ?";
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, email);
         return count != null && count > 0;
     }
 }

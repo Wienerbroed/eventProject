@@ -1,12 +1,18 @@
 package org.example.eventproject.controllers;
 
+import org.example.eventproject.models.UserLogin;
 import org.example.eventproject.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/api")
 public class LoginController {
 
     @Autowired
@@ -14,34 +20,22 @@ public class LoginController {
 
     @GetMapping("/register")
     public String showRegisterPage() {
-        return "register";
+        return "redirect:/register.html";
     }
 
     @PostMapping("/register")
-    public String registerUser(String username, String password, String email, String role) {
-        loginService.registerUser(username, password, email, role);
-        return "redirect:/login";
+    public String registerUser(String username, String password, String email) {
+        loginService.registerUser(username, password, email);
+        return "redirect:/register";
     }
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "login";
-    }
 
-    @PostMapping("/login")
-    public String loginUser(String username, String password) {
-        if (loginService.isValidUser(username, password)) {
-            return "redirect:/home";
-        } else {
-            return "redirect:/login?error";
-        }
-    }
+   /* @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody UserLogin userLogin){
+        loginService.registerUser(userLogin.getUsername(), userLogin.getPassword(), userLogin.getEmail());
+        return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully");
+    } */
 
-    public boolean isValidUser(String username, String password) {
-        return loginService.isValidUser(username, password);
-    }
 
-    public boolean existsByUsername(String username) {
-        return loginService.existsByUsername(username);
-    }
+
 }

@@ -23,7 +23,6 @@ app.use(express.static(path.join(__dirname, '..', 'public'))); // Serve static f
 
 // ---------- Event Routes ----------
 
-
 // Serve `event.html` at the `/events` route
 app.get('/events', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
@@ -44,6 +43,7 @@ app.get('/api/events', async (req, res) => {
         res.status(500).send('Error fetching events: ' + error.message);
     }
 });
+
 // Fetch a specific event by ID
 app.get('/api/events/:id', async (req, res) => {
     const eventId = req.params.id;
@@ -55,6 +55,7 @@ app.get('/api/events/:id', async (req, res) => {
         res.status(500).send('Error fetching activity: ' + error.message);
     }
 });
+
 // Add a new event
 app.post('/api/events/add', async (req, res) => {
     try {
@@ -72,5 +73,58 @@ app.post('/api/events/add', async (req, res) => {
         }
     } catch (error) {
         res.status(500).send('Error adding activity: ' + error.message);
+    }
+});
+
+// ---------- Register Routes ----------
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'register.html'));
+});
+
+app.post('/api/register', async (req, res) => {
+    const { username, password, email } = req.body;
+    try {
+        const response = await fetch('http://localhost:8080/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password, email })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            res.status(201).send('Registration successful');
+        } else {
+            res.status(400).send('Registration failed: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error during registration: ' + error.message);
+    }
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
+});
+
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const response = await fetch('http://localhost:8080/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            res.json({ success: true, message: 'Login successful', data });
+        } else {
+            res.status(401).json({ success: false, message: 'Login failed: ' + data.message });
+        }
+    } catch (error) {
+        res.status(500).send('Error during login: ' + error.message);
     }
 });
