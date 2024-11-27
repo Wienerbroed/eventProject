@@ -95,3 +95,24 @@ app.delete('/api/events/:id', async (req, res) => {
         res.status(500).send('Error deleting event: ' + error.message);
     }
 });
+// Update an existing event
+app.post('/api/events/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const eventData = req.body;
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+        });
+
+        if (postResponse.ok) {
+            res.status(200).send('Event updated successfully.');
+        } else {
+            res.status(postResponse.status).send('Failed to update event: ' + postResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error updating event: ' + error.message);
+    }
+});

@@ -11,6 +11,30 @@
     <h1>Event Details</h1>
 </header>
 <div id="eventDetailsContainer"></div>
+<form id="updateEventForm">
+    <input type="hidden" id="eventId" name="eventId">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+    <label for="eventCreator">Creator:</label>
+    <input type="text" id="eventCreator" name="eventCreator" required>
+    <label for="eventResponsible">Responsible:</label>
+    <input type="text" id="eventResponsible" name="eventResponsible" required>
+    <label for="eventControl">Control:</label>
+    <input type="text" id="eventControl" name="eventControl" required>
+    <label for="eventType">Type:</label>
+    <input type="text" id="eventType" name="eventType" required>
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" required></textarea>
+    <label for="maxParticipants">Max Participants:</label>
+    <input type="number" id="maxParticipants" name="maxParticipants" required>
+    <label for="maxAudience">Max Audience:</label>
+    <input type="number" id="maxAudience" name="maxAudience" required>
+    <label for="conguideDk">Guide (DK):</label>
+    <input type="text" id="conguideDk" name="conguideDk" required>
+    <label for="conguideEn">Guide (EN):</label>
+    <input type="text" id="conguideEn" name="conguideEn" required>
+    <button type="submit">Update Event</button>
+</form>
 
 <script>
     async function fetchEventDetails(eventId) {
@@ -27,19 +51,51 @@
     }
 
     function displayEventDetails(event) {
-        const eventDetailsContainer = document.getElementById('eventDetailsContainer');
-        eventDetailsContainer.innerHTML = `
-            <h2>${event.title}</h2>
-            <p><strong>Creator:</strong> ${event.eventCreator}</p>
-            <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
-            <p><strong>Control:</strong> ${event.eventControl}</p>
-            <p><strong>Type:</strong> ${event.eventType}</p>
-            <p><strong>Description:</strong> ${event.description}</p>
-            <p><strong>Max Participants:</strong> ${event.maxParticipants}</p>
-            <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
-            <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
-            <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
-        `;
+        document.getElementById('eventId').value = event.eventId;
+        document.getElementById('title').value = event.title;
+        document.getElementById('eventCreator').value = event.eventCreator;
+        document.getElementById('eventResponsible').value = event.eventResponsible;
+        document.getElementById('eventControl').value = event.eventControl;
+        document.getElementById('eventType').value = event.eventType;
+        document.getElementById('description').value = event.description;
+        document.getElementById('maxParticipants').value = event.maxParticipants;
+        document.getElementById('maxAudience').value = event.maxAudience;
+        document.getElementById('conguideDk').value = event.conguideDk;
+        document.getElementById('conguideEn').value = event.conguideEn;
+    }
+
+    async function updateEvent(event) {
+        event.preventDefault();
+        const eventId = document.getElementById('eventId').value;
+        const updatedEvent = {
+            title: document.getElementById('title').value,
+            eventCreator: document.getElementById('eventCreator').value,
+            eventResponsible: document.getElementById('eventResponsible').value,
+            eventControl: document.getElementById('eventControl').value,
+            eventType: document.getElementById('eventType').value,
+            description: document.getElementById('description').value,
+            maxParticipants: document.getElementById('maxParticipants').value,
+            maxAudience: document.getElementById('maxAudience').value,
+            conguideDk: document.getElementById('conguideDk').value,
+            conguideEn: document.getElementById('conguideEn').value
+        };
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedEvent)
+            });
+
+            if (response.ok) {
+                alert('Event updated successfully!');
+            } else {
+                alert('Failed to update event.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        }
     }
 
     // Get the event ID from the URL
@@ -52,6 +108,9 @@
     } else {
         console.error('Event ID not found in URL');
     }
+
+    // Add event listener to the form
+    document.getElementById('updateEventForm').addEventListener('submit', updateEvent);
 </script>
 </body>
 </html>

@@ -42,4 +42,19 @@ public class EventService {
         }
         eventRepository.deleteById(eventId);
     }
+
+    // Update Event
+    public Events updateEvent(Events event) {
+        if (!eventRepository.existsById(event.getEventId())) {
+            throw new EntityNotFoundException("Event not found with ID: " + event.getEventId());
+        }
+        eventRepository.updateEvent(event);
+        return event;
+    }
+
+
+
+
+
+
 }
