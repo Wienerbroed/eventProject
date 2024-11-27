@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Events</title>
+</head>
+<body>
+<h1>All Events</h1>
+<div id="eventsContainer"></div>
+
+<script>
+    async function fetchEvents() {
+        try {
+            const response = await fetch('http://localhost:3000/api/events');
+            if (!response.ok) {
+                throw new Error('Failed to fetch events');
+            }
+            const events = await response.json();
+            displayEvents(events);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function displayEvents(events) {
+        const eventsContainer = document.getElementById('eventsContainer');
+        eventsContainer.innerHTML = '';
+
+        events.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.innerHTML = `
+                    <h2>${event.title}</h2>
+                    <p>${event.eventCreator}</p>
+                    <p>${event.eventResponsible}</p>
+                    <p>${event.eventControl}</p>
+                    <p>${event.eventType}</p>
+                    <p>${event.description}</p>
+                    <p>${event.maxParticipants}</p>
+                    <p>${event.maxAudience}</p>
+                    <p>${event.conguideDk}</p>
+                    <p>${event.conguideEn}</p>
+
+
+
+
+
+                `;
+            eventsContainer.appendChild(eventElement);
+        });
+    }
+
+    // Fetch and display events when the page loads
+    window.onload = fetchEvents;
+</script>
+</body>
+</html>

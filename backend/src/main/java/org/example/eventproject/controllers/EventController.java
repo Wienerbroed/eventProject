@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping("api/events")
 public class EventController {
 
     private final EventService eventService;
@@ -19,6 +19,15 @@ public class EventController {
     public EventController(EventService eventService) {
         this.eventService = eventService;
     }
+
+
+    // Get All Events
+    @GetMapping()
+    public ResponseEntity<List<Events>> getAllEvents() {
+        List<Events> events = eventService.getAllEvents();
+        return ResponseEntity.ok(events);
+    }
+
 
     // Add Event
     @PostMapping("/add")
@@ -32,13 +41,6 @@ public class EventController {
     public ResponseEntity<Events> getEventById(@PathVariable Long eventId) {
         Optional<Events> event = eventService.getEventById(eventId);
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    // Get All Events
-    @GetMapping("/all")
-    public ResponseEntity<List<Events>> getAllEvents() {
-        List<Events> events = eventService.getAllEvents();
-        return ResponseEntity.ok(events);
     }
 
     // Delete Event
