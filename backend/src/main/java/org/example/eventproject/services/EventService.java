@@ -1,6 +1,7 @@
 package org.example.eventproject.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.eventproject.models.EventSchedule;
 import org.example.eventproject.repositories.EventRepository;
 import org.example.eventproject.models.Events;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,12 @@ public class EventService {
         eventRepository.addEvent(event);
         return event;
     }
+    //add event Schedule
+    public int addEventSchedule(EventSchedule schedule) {
+        return eventRepository.addEventSchedule(schedule);
+    }
+
+
 
     // Get Event by ID
     public Optional<Events> getEventById(Long eventId) {
@@ -50,6 +57,19 @@ public class EventService {
         }
         eventRepository.updateEvent(event);
         return event;
+    }
+
+    // Favorite an event
+    public boolean favoriteEvent(int userId, int eventId) {
+        if (eventRepository.isEventFavoritedByUser(userId, eventId)) {
+            return false; // Event already favorited
+        }
+        return eventRepository.addFavorite(userId, eventId);
+    }
+
+    // Get all favorites for a user
+    public List<Events> getUserFavorites(int userId) {
+        return eventRepository.getUserFavorites(userId);
     }
 
 

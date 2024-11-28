@@ -5,6 +5,7 @@ import org.example.eventproject.models.EventRequirements;
 import org.example.eventproject.models.EventSchedule;
 import org.example.eventproject.models.Events;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -77,6 +78,33 @@ public class EventRepository {
     public int updateEvent(Events event) {
         String sql = "UPDATE events SET title = ?, event_creator = ?, event_responsible = ?, event_control = ?, event_type = ?, description = ?, max_participants = ?, max_audience = ?, conguide_dk = ?, conguide_en = ? WHERE event_id = ?";
         return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(), event.getEventId());
+    }
+
+    // Add favorite
+    public boolean addFavorite(int userId, int eventId) {
+        String sql = "INSERT INTO UserFavorites (user_id, event_id) VALUES (?, ?)";
+        try {
+            jdbcTemplate.update(sql, userId, eventId);
+            return true;
+        } catch (DuplicateKeyException e) {
+            System.out.println("Event is already favorited by the user.");
+            return false;
+        }
+    }
+
+    // Check if an event is already favorited by the user
+    public boolean isEventFavoritedByUser(int userId, int eventId) {
+        String sql = "SELECT COUNT(*) FROM UserFavorites WHERE user_id = ? AND event_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{userId, eventId}, Integer.class);
+        return count != null && count > 0;
+    }
+
+    // Get all favorited events for a user
+    public List<Events> getUserFavorites(int userId) {
+        String sql = "SELECT e.* FROM Events e " +
+                "JOIN UserFavorites uf ON e.event_id = uf.event_id " +
+                "WHERE uf.user_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{userId}, new BeanPropertyRowMapper<>(Events.class));
     }
 
 
