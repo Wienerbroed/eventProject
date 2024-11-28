@@ -39,6 +39,13 @@ app.get('/events/:id', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'seeEvent.html'));
 });
 
+app.get('/addEventSchedule', (req, res) => {
+    const eventId = req.query.eventId;  // Access the eventId from the query string
+    console.log('Event ID:', eventId);  // You can use this ID to fetch event details or perform other actions
+    res.sendFile(path.join(__dirname, '..', 'public', 'addEventSchedule.html'));
+});
+
+
 
 // Fetch events from the backend API
 app.get('/api/events', async (req, res) => {

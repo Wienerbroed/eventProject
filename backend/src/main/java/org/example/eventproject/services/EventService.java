@@ -1,6 +1,7 @@
 package org.example.eventproject.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.eventproject.models.EventSchedule;
 import org.example.eventproject.repositories.EventRepository;
 import org.example.eventproject.models.Events;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,12 @@ public class EventService {
         eventRepository.addEvent(event);
         return event;
     }
+    //add event Schedule
+    public int addEventSchedule(EventSchedule schedule) {
+        return eventRepository.addEventSchedule(schedule);
+    }
+
+
 
     // Get Event by ID
     public Optional<Events> getEventById(Long eventId) {

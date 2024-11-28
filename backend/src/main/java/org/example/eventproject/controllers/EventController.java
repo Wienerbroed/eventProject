@@ -1,8 +1,10 @@
 package org.example.eventproject.controllers;
 
+import org.example.eventproject.models.EventSchedule;
 import org.example.eventproject.models.Events;
 import org.example.eventproject.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,24 @@ public class EventController {
         Events createdEvent = eventService.addEvent(event);
         return ResponseEntity.ok(createdEvent);
     }
+
+    // Add Event Schedule
+    @PostMapping("/addSchedule/{eventId}")
+    public ResponseEntity<EventSchedule> addEventSchedule(@PathVariable Long eventId, @RequestBody EventSchedule schedule) {
+        // Ensure the schedule is associated with the eventId
+        schedule.setEventId(eventId);
+
+        int result = eventService.addEventSchedule(schedule);
+
+        if (result == 1) {
+            return ResponseEntity.ok(schedule);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null); // Optionally return null or error details
+        }
+    }
+
+
 
     // Get Event by ID
     @GetMapping("/{eventId}")
