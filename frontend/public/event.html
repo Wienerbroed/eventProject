@@ -4,18 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Events</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        .favorite-btn {
+            cursor: pointer;
+            font-size: 24px;
+            color: gray;
+            border: none;
+            background: none;
+        }
+
+        .favorite-btn.favorited {
+            color: red; /* Change color to red when favorited */
+        }
+
+        .add-event-btn {
+            display: none; /* Hidden by default */
+        }
+
+        .add-event-btn.visible {
+            display: inline-block; /* Show button when user is authorized */
+        }
+    </style>
 </head>
 <body>
 <header>
     <h1>All Events</h1>
 </header>
 <div>
-    <button class="add-event-btn" onclick="window.location.href='addEvent.html';">Add Event</button>
+    <button class="add-event-btn" id="addEventBtn" onclick="window.location.href='addEvent.html';">Add Event</button>
 </div>
 <div id="eventsContainer"></div>
 
 <script>
+    const userId = 1; // Replace with logic to get logged-in user ID
+
+    // Function to fetch user role and update the Add Event button visibility
+    async function checkUserRole() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/user/role?userId=${userId}`);
+            if (response.ok) {
+                const { role } = await response.json();
+                if (role === 'admin' || role === 'afvikler') {
+                    document.getElementById('addEventBtn').classList.add('visible');
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching user role:', error);
+        }
+    }
+
     async function fetchEvents() {
         try {
             const response = await fetch('http://localhost:3000/api/events');
@@ -47,26 +84,42 @@
                 <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
                 <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
                 <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
-                <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
+                <button class="favorite-btn" id="favorite-${event.eventId}" onclick="toggleFavorite(${event.eventId}, this)">&#x2764;</button>
             `;
             eventsContainer.appendChild(eventElement);
+
+            checkFavorite(event.eventId);
         });
     }
 
-    async function deleteEvent(eventId) {
-        const confirmation = confirm("Are you sure you want to delete this event?");
-        if (!confirmation) return;
-
+    async function checkFavorite(eventId) {
         try {
-            const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
-                method: 'DELETE'
+            const response = await fetch(`http://localhost:3000/api/events/${eventId}/isFavorited?userId=${userId}`);
+            if (response.ok) {
+                const isFavorited = await response.json();
+                const button = document.getElementById(`favorite-${eventId}`);
+                if (isFavorited) {
+                    button.classList.add('favorited');
+                }
+            }
+        } catch (error) {
+            console.error('Error checking favorite status:', error);
+        }
+    }
+
+    async function toggleFavorite(eventId, button) {
+        try {
+            const method = button.classList.contains('favorited') ? 'DELETE' : 'POST';
+            const response = await fetch(`http://localhost:3000/api/events/${eventId}/favorite`, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
             });
 
             if (response.ok) {
-                alert('Event deleted successfully!');
-                fetchEvents(); // Refresh the event list after deletion
+                button.classList.toggle('favorited');
             } else {
-                alert('Failed to delete event.');
+                alert('Error updating favorite status');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -74,8 +127,10 @@
         }
     }
 
-    // Fetch and display events when the page loads
-    window.onload = fetchEvents;
+    window.onload = () => {
+        fetchEvents();
+        checkUserRole();
+    };
 </script>
 </body>
 </html>

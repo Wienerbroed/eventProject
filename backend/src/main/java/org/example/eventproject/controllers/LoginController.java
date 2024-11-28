@@ -44,4 +44,10 @@ public class LoginController {
     public boolean existsByUsername(String username) {
         return loginService.existsByUsername(username);
     }
+
+    @PostMapping("/changeRole")
+    public String changeUserRole(Long userId, String newRole) {
+        loginService.changeUserRole(userId, newRole);
+        return "redirect:/mypage/" + userId; // Redirect back to the user's MyPage
+    }
 }

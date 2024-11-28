@@ -1,6 +1,7 @@
 package org.example.eventproject.services;
 
 
+import org.example.eventproject.models.Role;
 import org.example.eventproject.repositories.LoginRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,9 @@ public class LoginService {
         return loginRepo.existsByUsername(username);
     }
 
-
+    public void changeUserRole(Long userId, String newRole) {
+        loginRepo.changeRole(userId, Role.valueOf(newRole));
+    }
 
 
 

@@ -52,3 +52,13 @@ CREATE TABLE IF NOT EXISTS login (
                                      email VARCHAR(50) NOT NULL UNIQUE,
                                      role VARCHAR(20) NOT NULL DEFAULT 'USER'
 );
+
+CREATE TABLE IF NOT EXISTS UserFavorites (
+                                             id INT AUTO_INCREMENT PRIMARY KEY,
+                                             user_id  INT NOT NULL,
+                                             event_id INT NOT NULL,
+                                             FOREIGN KEY (user_id) REFERENCES login (id) ON DELETE CASCADE,
+                                             FOREIGN KEY (event_id) REFERENCES Events (event_id) ON DELETE CASCADE,
+                                             UNIQUE (user_id, event_id)
+
+);

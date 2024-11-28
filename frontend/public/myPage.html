@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Favorites</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>My Favorite Events</h1>
+</header>
+<div id="favoritesContainer"></div>
+
+<script>
+  const userId = 1; // Replace with actual logged-in user ID
+
+  async function fetchFavorites() {
+    try {
+      const response = await fetch(`http://localhost:3000/api/events/mypage/favorites?userId=${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch favorites');
+      }
+      const favorites = await response.json();
+      displayFavorites(favorites);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  function displayFavorites(events) {
+    const favoritesContainer = document.getElementById('favoritesContainer');
+    favoritesContainer.innerHTML = '';
+
+    if (events.length === 0) {
+      favoritesContainer.innerHTML = '<p>You have no favorite events.</p>';
+      return;
+    }
+
+    events.forEach(event => {
+      const eventElement = document.createElement('div');
+      eventElement.classList.add('event');
+      eventElement.innerHTML = `
+                <h2 onclick="window.location.href='seeEvent.html?id=${event.eventId}'">${event.title}</h2>
+                <p><strong>Creator:</strong> ${event.eventCreator}</p>
+                <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
+                <p><strong>Control:</strong> ${event.eventControl}</p>
+                <p><strong>Type:</strong> ${event.eventType}</p>
+                <p><strong>Description:</strong> ${event.description}</p>
+                <p><strong>Max Participants:</strong> ${event.maxParticipants}</p>
+                <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
+                <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
+                <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
+            `;
+      favoritesContainer.appendChild(eventElement);
+    });
+  }
+
+  window.onload = fetchFavorites;
+</script>
+</body>
+</html>
