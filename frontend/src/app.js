@@ -116,3 +116,59 @@ app.post('/api/events/:id', async (req, res) => {
         res.status(500).send('Error updating event: ' + error.message);
     }
 });
+
+// Serve `loginAndRegisterPage.html` at `/loginAndRegisterPage` route
+app.get('/loginAndRegisterPage', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'loginAndRegisterPage.html'));
+});
+
+// Handle user registration
+app.post('/api/register', async (req, res) => {
+    try {
+        const { username, password, email } = req.body;
+
+        // Forward the data to the Spring Boot API
+        const response = await fetch('http://localhost:8080/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, email })
+        });
+
+        if (response.ok) {
+            res.status(201).send('User registered successfully.');
+        } else {
+            const errorText = await response.text();
+            res.status(response.status).send('Failed to register user: ' + errorText);
+        }
+    } catch (error) {
+        console.error('Error registering user:', error);
+        res.status(500).send('Error registering user: ' + error.message);
+    }
+});
+
+// Handle user login
+app.post('/api/login', async (req, res) => {
+    try {
+        const loginData = req.body;
+        const response = await fetch('http://localhost:8080/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(loginData)
+        });
+
+        if (response.redirected) {
+            res.redirect(response.url); // Handle backend redirection
+        } else if (response.ok) {
+            res.status(200).send('Login successful.');
+        } else {
+            res.status(401).send('Invalid username or password.');
+        }
+    } catch (error) {
+        res.status(500).send('Error logging in: ' + error.message);
+    }
+});
+
+// Example home route to test redirection after successful login
+app.get('/home', (req, res) => {
+    res.send('<h1>Welcome to the Home Page!</h1>');
+});
