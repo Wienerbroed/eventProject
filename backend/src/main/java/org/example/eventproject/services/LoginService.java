@@ -6,6 +6,8 @@ import org.example.eventproject.repositories.LoginRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class LoginService {
 
@@ -31,9 +33,16 @@ public class LoginService {
         return loginRepo.existsByUsername(username);
     }
 
-    // method to change the user's role
-    public void changeUserRole(String username, Role newRole) {
-        loginRepo.updateUserRole(username, newRole);
+    public boolean isValidRole(Role role) {
+        return List.of(Role.USER, Role.AFVIKLER).contains(role); // Admin can delegate these roles only
+    }
+
+    public Role getUserRole(String username) {
+        return loginRepo.getUserRole(username);
+    }
+
+    public void logRoleChange(String adminUsername, String targetUsername, Role oldRole, Role newRole) {
+        loginRepo.logRoleChange(adminUsername, targetUsername, oldRole, newRole);
     }
 
 

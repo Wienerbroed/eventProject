@@ -41,9 +41,13 @@ public class LoginRepo {
         return count != null && count > 0;
     }
 
-    // method to update the user's role
-    public void updateUserRole(String username, Role newRole) {
-        String updateQuery = "UPDATE login SET role = ? WHERE username = ?";
-        jdbcTemplate.update(updateQuery, newRole.name(), username);
+    public Role getUserRole(String username) {
+        String query = "SELECT role FROM login WHERE username = ?";
+        return Role.valueOf(jdbcTemplate.queryForObject(query, String.class, username));
+    }
+
+    public void logRoleChange(String adminUsername, String targetUsername, Role oldRole, Role newRole) {
+        String query = "INSERT INTO role_changes (admin, target_user, old_role, new_role, timestamp) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)";
+        jdbcTemplate.update(query, adminUsername, targetUsername, oldRole.name(), newRole.name());
     }
 }

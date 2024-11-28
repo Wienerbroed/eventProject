@@ -1,5 +1,6 @@
 package org.example.eventproject.controllers;
 
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.example.eventproject.models.Role;
 import org.example.eventproject.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.nio.file.AccessDeniedException;
 
 @Controller
 public class LoginController {
@@ -50,8 +53,25 @@ public class LoginController {
 
     @PostMapping("/admin/delegate-role")
     @PreAuthorize("hasRole('ADMIN')")
-    public String delegateRole(@RequestParam String username, @RequestParam Role role) {
+    public String delegateRole(@RequestParam String username, @RequestParam Role role, Authentication authentication) {
+        String currentAdmin = authentication.getName();
+
+        if (username.equals(currentAdmin)) {
+            throw new AccessDeniedException("Admins cannot change their own roles.");
+        }
+
+        Role currentRole = loginService.getUserRole(username);
+        if (currentRole == role) {
+            throw new IllegalArgumentException("The user already has this role.");
+        }
+
+        if (!loginService.isValidRole(role)) {
+            throw new AccessDeniedException("You cannot delegate this role.");
+        }
+
         loginService.changeUserRole(username, role);
+        loginService.logRoleChange(currentAdmin, username, currentRole, role);
+
         return "redirect:/admin/dashboard";
     }
 
