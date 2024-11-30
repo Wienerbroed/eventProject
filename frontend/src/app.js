@@ -156,19 +156,19 @@ app.post('/api/login', async (req, res) => {
             body: JSON.stringify(loginData)
         });
 
-        if (response.redirected) {
-            res.redirect(response.url); // Handle backend redirection
-        } else if (response.ok) {
+        if (response.ok) {
             res.status(200).send('Login successful.');
         } else {
-            res.status(401).send('Invalid username or password.');
+            const errorText = await response.text();
+            res.status(401).send('Invalid username or password: ' + errorText);
         }
     } catch (error) {
         res.status(500).send('Error logging in: ' + error.message);
     }
 });
 
-// Example home route to test redirection after successful login
-app.get('/home', (req, res) => {
-    res.send('<h1>Welcome to the Home Page!</h1>');
+// Serve events page
+app.get('/events', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
+

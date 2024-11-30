@@ -40,4 +40,14 @@ public class LoginRepo {
         Integer count = jdbcTemplate.queryForObject(query, Integer.class, username);
         return count != null && count > 0;
     }
+
+    public UserLogin findByUsername(String username) {
+        String query = "SELECT * FROM login WHERE username = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{username}, (rs, rowNum) ->
+                new UserLogin(
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("email")
+                ));
+    }
 }

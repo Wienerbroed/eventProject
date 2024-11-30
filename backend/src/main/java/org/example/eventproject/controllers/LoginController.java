@@ -17,17 +17,6 @@ public class LoginController {
     private LoginService loginService;
 
 
-    @GetMapping("/loginAndRegisterPage")
-    public String showLoginAndRegisterPage() {
-        return "loginAndRegisterPage";
-    }
-
-    /*@PostMapping("/register")
-    public String registerUser(String username, String password, String email) {
-        loginService.registerUser(username, password, email);
-        return "redirect:/loginAndRegisterPage"; // Redirects back to the login and register page
-    }*/
-
     @PostMapping("/register")
     public ResponseEntity<UserLogin> registerUser(@RequestBody UserLogin userLogin) {
         UserLogin createdUser = loginService.registerUser(userLogin);
@@ -35,19 +24,18 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String loginUser(String username, String password) {
-        if (loginService.isValidUser(username, password)) {
-            return "redirect:/home"; // Redirects to the home page if login is successful
+    public ResponseEntity<String> loginUser(@RequestBody UserLogin userLogin) {
+        if (loginService.isValidUser(userLogin.getUsername(), userLogin.getPassword())) {
+            return ResponseEntity.ok("Login successful");
         } else {
-            return "redirect:/loginAndRegisterPage?error=true"; // Redirects back with an error flag
+            return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
 
     @GetMapping("/login")
     public String showLoginPage() {
-        return "login";
+        return "loginAndRegisterPage";
     }
-
 
     public boolean isValidUser(String username, String password) {
         return loginService.isValidUser(username, password);
