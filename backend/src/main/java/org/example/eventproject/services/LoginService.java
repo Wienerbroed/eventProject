@@ -1,6 +1,7 @@
 package org.example.eventproject.services;
 
 
+import org.example.eventproject.models.UserLogin;
 import org.example.eventproject.repositories.LoginRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,16 +15,15 @@ public class LoginService {
     private LoginRepo loginRepo;
 
 
-    public void registerUser(String username, String password, String email, String role) {
-        loginRepo.registerUser(username, password, email, role);
+    public UserLogin registerUser(UserLogin userLogin) {
+        loginRepo.registerUser(userLogin);
+        return userLogin;
     }
 
-    public void loginUser(String username, String password) {
-        loginRepo.loginUser(username, password);
-    }
 
     public boolean isValidUser(String username, String password) {
-        return loginRepo.isValidUser(username, password);
+        UserLogin user = loginRepo.findByUsername(username);
+        return user != null && user.getPassword().equals(password);
     }
 
     public boolean existsByUsername(String username) {
