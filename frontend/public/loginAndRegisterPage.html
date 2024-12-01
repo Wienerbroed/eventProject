@@ -5,6 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login and Register</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -25,24 +63,60 @@
         <p id="loginError" class="error-message"></p>
     </form>
 
-    <!-- Registration Form -->
-    <form id="registerForm" method="POST" action="/register">
-        <h2>Register</h2>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+    <h4>Har du ikke et bruger? Så kan du lave en her!</h4>
+    <!-- Trigger/Open The Modal -->
+    <button id="registerBtn">Register</button>
+</div>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+<!-- The Modal -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <!-- Registration Form -->
+        <form id="registerForm" method="POST" action="/register">
+            <h2>Register</h2>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
 
-        <button type="submit">Register</button>
-        <p id="registerError" class="error-message"></p>
-    </form>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <button type="submit">Register</button>
+            <p id="registerError" class="error-message"></p>
+        </form>
+    </div>
 </div>
 
 <script>
+    // Get the modal
+    var modal = document.getElementById("registerModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("registerBtn");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
     document.getElementById('registerForm').addEventListener('submit', async function(event) {
         event.preventDefault();
 
@@ -62,7 +136,6 @@
             });
 
             if (response.ok) {
-                alert('User added successfully!');
                 window.location.href = '/loginAndRegisterPage'; // Redirect to login and register page
             } else {
                 alert('Failed to add user.');
@@ -91,7 +164,6 @@
             });
 
             if (response.ok) {
-                alert('Login successful!');
                 window.location.href = '/events'; // Redirect to events page
             } else {
                 alert('Invalid username or password.');
@@ -101,9 +173,6 @@
             alert('An error occurred.');
         }
     });
-
-
-
 </script>
 </body>
 </html>
