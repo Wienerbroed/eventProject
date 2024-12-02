@@ -31,7 +31,6 @@ public class EventService {
     }
 
 
-
     // Get Event by ID
     public Optional<Events> getEventById(Long eventId) {
         return eventRepository.findById(eventId);

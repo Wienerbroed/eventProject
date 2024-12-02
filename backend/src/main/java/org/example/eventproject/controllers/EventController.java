@@ -54,8 +54,6 @@ public class EventController {
         }
     }
 
-
-
     // Get Event by ID
     @GetMapping("/{eventId}")
     public ResponseEntity<Events> getEventById(@PathVariable Long eventId) {
