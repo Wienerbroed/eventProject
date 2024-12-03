@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(Server is running on http://localhost:${PORT});
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 // Middleware setup
@@ -24,17 +24,17 @@ app.use(express.static(path.join(__dirname, '..', 'public'))); // Serve static f
 // ---------- Event Routes ----------
 
 
-// Serve event.html at the /events route
+// Serve `event.html` at the `/events` route
 app.get('/events', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
 
-// Serve addEvent.html at the /events/add route
+// Serve `addEvent.html` at the `/events/add` route
 app.get('/events/add', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'addEvent.html'));
 });
 
-// Serve seeEvent.html at the /events/:id route
+// Serve `seeEvent.html` at the `/events/:id` route
 app.get('/events/:id', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'seeEvent.html'));
 });
@@ -61,7 +61,7 @@ app.get('/api/events', async (req, res) => {
 app.get('/api/events/:id', async (req, res) => {
     const eventId = req.params.id;
     try {
-        const response = await fetch(http://localhost:8080/api/events/${eventId});
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}`);
         const event = await response.json();
         res.json(event);
     } catch (error) {
@@ -91,7 +91,7 @@ app.post('/api/events/add', async (req, res) => {
 app.delete('/api/events/:id', async (req, res) => {
     try {
         const eventId = req.params.id;
-        const deleteResponse = await fetch(http://localhost:8080/api/events/${eventId}, { method: 'DELETE' });
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/${eventId}`, { method: 'DELETE' });
 
         if (deleteResponse.ok) {
             res.status(204).send('Event deleted successfully.');
@@ -108,23 +108,23 @@ app.post('/api/events/:id', async (req, res) => {
         const eventId = req.params.id;
         const eventData = req.body;
 
-        const postResponse = await fetch(http://localhost:8080/api/events/${eventId}, {
-        method: 'POST',
+        const postResponse = await fetch(`http://localhost:8080/api/events/${eventId}`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData)
-    });
+            body: JSON.stringify(eventData)
+        });
 
-    if (postResponse.ok) {
-        res.status(200).send('Event updated successfully.');
-    } else {
-        res.status(postResponse.status).send('Failed to update event: ' + postResponse.statusText);
+        if (postResponse.ok) {
+            res.status(200).send('Event updated successfully.');
+        } else {
+            res.status(postResponse.status).send('Failed to update event: ' + postResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error updating event: ' + error.message);
     }
-} catch (error) {
-    res.status(500).send('Error updating event: ' + error.message);
-}
 });
 
-// Serve loginAndRegisterPage.html at /loginAndRegisterPage route
+// Serve `loginAndRegisterPage.html` at `/loginAndRegisterPage` route
 app.get('/loginAndRegisterPage', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'loginAndRegisterPage.html'));
 });
@@ -178,3 +178,4 @@ app.post('/api/login', async (req, res) => {
 app.get('/events', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
+
