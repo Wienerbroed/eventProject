@@ -1,5 +1,6 @@
 package org.example.eventproject.repositories;
 
+import org.example.eventproject.models.Role;
 import org.example.eventproject.models.UserLogin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,13 +42,22 @@ public class LoginRepo {
         return count != null && count > 0;
     }
 
+    // Update the user's role in the database
+    public int updateUserRole(String username, org.example.eventproject.models.Role newRole) {
+        String sql = "UPDATE login SET role = ? WHERE username = ?";
+        return jdbcTemplate.update(sql, newRole.name(), username); // Update the role in the database
+    }
+
+    // Find a user by username
     public UserLogin findByUsername(String username) {
         String query = "SELECT * FROM login WHERE username = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{username}, (rs, rowNum) ->
                 new UserLogin(
                         rs.getString("username"),
                         rs.getString("password"),
-                        rs.getString("email")
-                ));
+                        rs.getString("email"),
+                        Role.valueOf(rs.getString("role"))
+                )
+        );
     }
 }
