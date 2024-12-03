@@ -43,9 +43,9 @@ public class LoginController {
         boolean success = loginService.delegateRole(adminUsername, targetUsername, newRole);
 
         if (success) {
-            return ResponseEntity.ok("Role updated successfully");
+            return ResponseEntity.ok("Role updated successfully.");
         } else {
-            return ResponseEntity.status(403).body("Insufficient permissions or invalid request");
+            return ResponseEntity.status(403).body("Insufficient permissions or user not found.");
         }
     }
 

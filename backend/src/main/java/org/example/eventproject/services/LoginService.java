@@ -21,21 +21,9 @@ public class LoginService {
         return userLogin;
     }
 
-    // Method to delegate roles, only allowing admins or superadmins to perform the action
     public boolean delegateRole(String adminUsername, String targetUsername, Role newRole) {
-        // Fetch the admin user to ensure they have permission
-        UserLogin adminUser = loginRepo.findByUsername(adminUsername);
-
-        // Check if the admin has sufficient privileges (Admin or SuperAdmin)
-        if (adminUser != null && (adminUser.getRole() == Role.ADMIN || adminUser.getRole() == Role.SUPERADMIN)) {
-            // Update the target user's role
-            return loginRepo.updateUserRole(targetUsername, newRole) > 0; // Returns true if successful
-        }
-
-        // If admin doesn't have permission, return false
-        return false;
+        return loginRepo.delegateRole(adminUsername, targetUsername, newRole);
     }
-
 
     public boolean isValidUser(String username, String password) {
         UserLogin user = loginRepo.findByUsername(username);
