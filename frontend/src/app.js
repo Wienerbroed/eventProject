@@ -179,3 +179,11 @@ app.get('/events', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
 
+app.get('/delegate-role', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'delegateRole.html'));
+});
+
+
+
+
+
