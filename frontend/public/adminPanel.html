@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .role-select {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+<h1>User Management</h1>
+<table>
+  <thead>
+  <tr>
+    <th>Username</th>
+    <th>Email</th>
+    <th>Current Role</th>
+    <th>Assign New Role</th>
+  </tr>
+  </thead>
+  <tbody id="userTable"></tbody>
+</table>
+
+<script>
+  // Fetch all users and display them in the table
+  async function fetchUsers() {
+    try {
+      const response = await axios.get('/users');
+      const users = response.data;
+
+      const userTable = document.getElementById('userTable');
+      userTable.innerHTML = '';
+
+      users.forEach(user => {
+        const row = `
+                        <tr>
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td>${user.role}</td>
+                            <td>
+                                <select class="role-select" data-username="${user.username}">
+                                    <option value="USER">USER</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                    <option value="SUPERADMIN">SUPERADMIN</option>
+                                    <option value="UDVIKLER">UDVIKLER</option>
+                                    <option value="AFVIKLER">AFVIKLER</option>
+                                </select>
+                                <button onclick="assignRole('${user.username}')">Assign</button>
+                            </td>
+                        </tr>
+                    `;
+        userTable.innerHTML += row;
+      });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }
+
+  // Assign a new role to a user
+  async function assignRole(username) {
+    const select = document.querySelector(`select[data-username="${username}"]`);
+    const newRole = select.value;
+
+    try {
+      const response = await axios.post('/delegateRole', null, {
+        params: {
+          adminUsername: 'yourAdminUsername', // Replace with actual admin username
+          targetUsername: username,
+          newRole: newRole
+        }
+      });
+      alert(response.data);
+      fetchUsers(); // Refresh the user list
+    } catch (error) {
+      alert('Error assigning role: ' + error.response.data);
+    }
+  }
+
+  // Load users on page load
+  window.onload = fetchUsers;
+</script>
+</body>
+</html>

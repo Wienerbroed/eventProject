@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 public class LoginController {
 
@@ -34,7 +36,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/delegate-role")
+    @PostMapping("/delegateRole")
     public ResponseEntity<String> delegateRole(
             @RequestParam String adminUsername,
             @RequestParam String targetUsername,
@@ -60,5 +62,11 @@ public class LoginController {
 
     public boolean existsByUsername(String username) {
         return loginService.existsByUsername(username);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserLogin>> getAllUsers() {
+        List<UserLogin> users = loginService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 }

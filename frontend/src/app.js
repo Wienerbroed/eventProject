@@ -179,3 +179,6 @@ app.get('/events', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
 
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'adminPanel.html'));
+});

@@ -7,6 +7,8 @@ import org.example.eventproject.repositories.LoginRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class LoginService {
 
@@ -32,6 +34,10 @@ public class LoginService {
 
     public boolean existsByUsername(String username) {
         return loginRepo.existsByUsername(username);
+    }
+
+    public List<UserLogin> getAllUsers() {
+        return loginRepo.findAllUsers();
     }
 
 

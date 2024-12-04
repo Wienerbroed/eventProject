@@ -38,8 +38,8 @@ public class EventController {
         return ResponseEntity.ok(createdEvent);
     }
 
-    /*// Add Event Schedule
-    @PostMapping("/addSchedule/{eventId}")
+    // Add Event Schedule
+    /*@PostMapping("/addSchedule/{eventId}")
     public ResponseEntity<EventSchedule> addEventSchedule(@PathVariable Long eventId, @RequestBody EventSchedule schedule) {
         // Ensure the schedule is associated with the eventId
         schedule.setEventId(eventId);

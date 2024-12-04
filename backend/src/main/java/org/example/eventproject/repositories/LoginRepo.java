@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class LoginRepo {
 
@@ -75,6 +77,18 @@ public class LoginRepo {
     public UserLogin findByUsername(String username) {
         String query = "SELECT * FROM login WHERE username = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{username}, (rs, rowNum) ->
+                new UserLogin(
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("email"),
+                        Role.valueOf(rs.getString("role"))
+                )
+        );
+    }
+
+    public List<UserLogin> findAllUsers() {
+        String sql = "SELECT * FROM login";
+        return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new UserLogin(
                         rs.getString("username"),
                         rs.getString("password"),
