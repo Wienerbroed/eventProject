@@ -57,6 +57,7 @@ app.get('/api/events', async (req, res) => {
         res.status(500).send('Error fetching events: ' + error.message);
     }
 });
+
 // Fetch a specific event by ID
 app.get('/api/events/:id', async (req, res) => {
     const eventId = req.params.id;
@@ -195,5 +196,30 @@ app.get('/api/users', async (req, res) => {
     } catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).send('Error fetching users: ' + error.message);
+    }
+});
+
+app.post('/api/assignRole', async (req, res) => {
+    try {
+        const roleData = req.body;
+
+        // Send the POST request to the Java backend
+        const response = await fetch('http://localhost:8080/api/assignRole', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(roleData),
+        });
+
+        // Check if the response is okay
+        if (response.ok) {
+            const responseMessage = await response.text(); // Assuming the Java endpoint returns plain text
+            res.status(200).send(responseMessage);
+        } else {
+            const errorMessage = await response.text();
+            res.status(response.status).send(errorMessage);
+        }
+    } catch (error) {
+        console.error('Error assigning role:', error);
+        res.status(500).send('Error assigning role: ' + error.message);
     }
 });

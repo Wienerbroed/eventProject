@@ -41,6 +41,10 @@
 </table>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    fetchUsers();  // Initial fetch when page loads
+  });
+
   // Fetch and populate users
   function fetchUsers() {
     fetch('http://localhost:3000/api/users')  // Make sure this URL matches the Express server
@@ -91,7 +95,7 @@
     const roleSelect = document.getElementById(`role-${username}`);
     const newRole = roleSelect.value;
 
-    fetch('http://localhost:8080/assignRole', {
+    fetch('http://localhost:3000/api/assignRole', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
