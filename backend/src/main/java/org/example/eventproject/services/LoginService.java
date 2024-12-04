@@ -19,14 +19,13 @@ public class LoginService {
 
 
     public UserLogin registerUser(UserLogin userLogin) {
+        // Ensure role is set
+        if (userLogin.getRole() == null) {
+            userLogin.setRole(Role.USER);
+        }
         loginRepo.registerUser(userLogin);
         return userLogin;
     }
-
-    public boolean delegateRole(String adminUsername, String targetUsername, Role newRole) {
-        return loginRepo.delegateRole(adminUsername, targetUsername, newRole);
-    }
-
     public boolean isValidUser(String username, String password) {
         UserLogin user = loginRepo.findByUsername(username);
         return user != null && user.getPassword().equals(password);
@@ -36,14 +35,16 @@ public class LoginService {
         return loginRepo.existsByUsername(username);
     }
 
-    public List<UserLogin> getAllUsers() {
+    public List<UserLogin> findAllUsers() {
         return loginRepo.findAllUsers();
     }
 
-
-
-
-
-
+    public boolean assignUserRole(UserLogin userLogin) {
+        if (!loginRepo.existsByUsername(userLogin.getUsername())) {
+            return false;
+        }
+        loginRepo.updateUser(userLogin);
+        return true;
+    }
 
 }

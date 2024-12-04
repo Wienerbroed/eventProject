@@ -1,16 +1,11 @@
 package org.example.eventproject.controllers;
 
-import org.example.eventproject.models.Events;
-import org.example.eventproject.models.Role;
 import org.example.eventproject.models.UserLogin;
 import org.example.eventproject.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,13 +15,14 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-
+    // Register a user
     @PostMapping("/register")
     public ResponseEntity<UserLogin> registerUser(@RequestBody UserLogin userLogin) {
         UserLogin createdUser = loginService.registerUser(userLogin);
         return ResponseEntity.ok(createdUser);
     }
 
+    // Login a user
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody UserLogin userLogin) {
         if (loginService.isValidUser(userLogin.getUsername(), userLogin.getPassword())) {
@@ -36,37 +32,20 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/delegateRole")
-    public ResponseEntity<String> delegateRole(
-            @RequestParam String adminUsername,
-            @RequestParam String targetUsername,
-            @RequestParam Role newRole) {
-
-        boolean success = loginService.delegateRole(adminUsername, targetUsername, newRole);
-
-        if (success) {
-            return ResponseEntity.ok("Role updated successfully.");
-        } else {
-            return ResponseEntity.status(403).body("Insufficient permissions or user not found.");
-        }
-    }
-
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "loginAndRegisterPage";
-    }
-
-    public boolean isValidUser(String username, String password) {
-        return loginService.isValidUser(username, password);
-    }
-
-    public boolean existsByUsername(String username) {
-        return loginService.existsByUsername(username);
-    }
-
+    // Get all users
     @GetMapping("/users")
     public ResponseEntity<List<UserLogin>> getAllUsers() {
-        List<UserLogin> users = loginService.getAllUsers();
+        List<UserLogin> users = loginService.findAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+    // Assign role to a user
+    @PostMapping("/assignRole")
+    public ResponseEntity<String> assignRole(@RequestBody UserLogin userLogin) {
+        if (loginService.assignUserRole(userLogin)) {
+            return ResponseEntity.ok("Role assigned successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Role assignment failed");
+        }
     }
 }

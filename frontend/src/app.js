@@ -179,6 +179,21 @@ app.get('/events', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
 
+// Serve admin page
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'adminPanel.html'));
+});
+
+app.get('/api/users', async (req, res) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/users');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch from Spring Boot API: ${response.statusText}`);
+        }
+        const users = await response.json();
+        res.json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).send('Error fetching users: ' + error.message);
+    }
 });
