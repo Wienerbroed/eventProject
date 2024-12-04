@@ -26,9 +26,9 @@ public class LoginService {
         loginRepo.registerUser(userLogin);
         return userLogin;
     }
+
     public boolean isValidUser(String username, String password) {
-        UserLogin user = loginRepo.findByUsername(username);
-        return user != null && user.getPassword().equals(password);
+        return loginRepo.isValidUser(username, password);
     }
 
     public boolean existsByUsername(String username) {

@@ -41,13 +41,9 @@
 </table>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    fetchUsers();  // Initial fetch when page loads
-  });
-
   // Fetch and populate users
   function fetchUsers() {
-    fetch('http://localhost:8080/users')  // Make sure this URL matches the Express server
+    fetch('http://localhost:3000/api/users')  // Make sure this URL matches the Express server
             .then(response => {
               if (!response.ok) {
                 throw new Error('Failed to fetch users: ' + response.statusText);  // Handle the error

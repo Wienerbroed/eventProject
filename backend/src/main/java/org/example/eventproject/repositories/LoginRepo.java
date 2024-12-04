@@ -56,4 +56,10 @@ public class LoginRepo {
                 )
         );
     }
+
+    public boolean isValidUser(String username, String password) {
+        String sql = "SELECT COUNT(*) FROM login WHERE username = ? AND password = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, username, password);
+        return count != null && count > 0;
+    }
 }
