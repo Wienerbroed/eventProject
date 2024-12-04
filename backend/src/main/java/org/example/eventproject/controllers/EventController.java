@@ -38,7 +38,7 @@ public class EventController {
         return ResponseEntity.ok(createdEvent);
     }
 
-    // Add Event Schedule
+   /* // Add Event Schedule
     @PostMapping("/addSchedule/{eventId}")
     public ResponseEntity<EventSchedule> addEventSchedule(@PathVariable Long eventId, @RequestBody EventSchedule schedule) {
         // Ensure the schedule is associated with the eventId
@@ -52,7 +52,7 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(null); // Optionally return null or error details
         }
-    }
+    }*/
 
 
 

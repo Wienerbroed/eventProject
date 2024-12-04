@@ -52,3 +52,9 @@ CREATE TABLE IF NOT EXISTS login (
                                      email VARCHAR(50) NOT NULL UNIQUE,
                                      role VARCHAR(20) NOT NULL DEFAULT 'USER'
 );
+
+CREATE TABLE IF NOT EXISTS venue (
+                                     venue_id INT AUTO_INCREMENT PRIMARY KEY,
+                                     venue_name VARCHAR(50) NOT NULL,
+                                     venue_address VARCHAR(50) NOT NULL
+);
