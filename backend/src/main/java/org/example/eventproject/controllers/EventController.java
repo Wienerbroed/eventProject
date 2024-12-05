@@ -77,6 +77,15 @@ public class EventController {
         return ResponseEntity.ok(updatedEvent);
     }
 
+    @GetMapping("/venue/{venueId}")
+    public ResponseEntity<List<Events>> getEventsByVenue(@PathVariable Long venueId) {
+        List<Events> events = eventService.getEventsByVenueId(venueId);
+        if (events.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(events);
+    }
+
 
 
 }

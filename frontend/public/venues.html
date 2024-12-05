@@ -44,6 +44,31 @@
             color: red;
             font-size: 14px;
         }
+        /* Style for venue boxes */
+        .venue-box {
+            padding: 20px;
+            margin: 10px;
+            background-color: #f0f0f0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .venue-box:hover {
+            background-color: #e0e0e0; /* Changes color on hover */
+        }
+
+        .venue-box h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .venue-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
@@ -140,15 +165,22 @@
 
             venues.forEach(venue => {
                 const venueElement = document.createElement('div');
-                venueElement.classList.add('venue');
+                venueElement.classList.add('venue-box');
                 venueElement.innerHTML = `
-                    <h2>${venue.venueName}</h2>
-                    <p><strong>Address:</strong> ${venue.venueAddress}</p>
-                    <button class="view-btn" onclick="viewVenueDetails('${venue.venueName}', '${venue.venueAddress}')">View Details</button>
-                `;
+            <h2>${venue.venueName}</h2>
+            <p><strong>Address:</strong> ${venue.venueAddress}</p>
+        `;
+
+                // Wrap the venue box in a clickable link
+                venueElement.addEventListener('click', () => {
+                    window.location.href = `eventsByVenue.html?venueId=${venue.venueId}`;
+                });
+
                 venueContainer.appendChild(venueElement);
             });
         }
+
+
 
         function viewVenueDetails(name, address) {
             document.getElementById('venueName').innerText = name;

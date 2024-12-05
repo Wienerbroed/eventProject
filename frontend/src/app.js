@@ -127,7 +127,32 @@ app.post('/api/events/:id', async (req, res) => {
         res.status(500).send('Error updating event: ' + error.message);
     }
 });
+// Fetch a specific event by ID
+app.get('/api/events/:id', async (req, res) => {
+    const eventId = req.params.id;
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}`);
+        const event = await response.json();
+        res.json(event);
+    } catch (error) {
+        res.status(500).send('Error fetching activity: ' + error.message);
+    }
+});
+app.get('/api/events/venue/:venueId', async (req, res) => {
+    const venueId = req.params.venueId; // Get the venueId from the URL parameter
 
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/venue/${venueId}`);
+        const events = await response.json();
+        if (!events) {
+            return res.status(404).json({ message: "No events found for this venue" });
+        }
+        res.json(events);
+    } catch (error) {
+        console.error("Error fetching events by venue:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 
 //------------------------login and registre---------------------------
@@ -193,6 +218,9 @@ app.post('/api/login', async (req, res) => {
 app.get('/venues', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
 });
+
+
+
 
 // --------------------- Venue  --------------
 

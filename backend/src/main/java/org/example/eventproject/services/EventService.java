@@ -68,6 +68,10 @@ public class EventService {
 
 
 
+    public List<Events> getEventsByVenueId(Long venueId) {
+        return eventRepository.getEventsByVenueId(venueId);
+    }
+
 
 
 

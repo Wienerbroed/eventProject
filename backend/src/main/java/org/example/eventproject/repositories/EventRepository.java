@@ -116,5 +116,32 @@ public class EventRepository {
         return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(),event.getVenueId(), event.getEventId());
     }
 
+    public List<Events> getEventsByVenueId(Long venueId) {
+        String sql = """
+            SELECT e.event_id, e.title, e.event_creator, e.event_responsible, 
+                   e.event_control, e.event_type, e.description, 
+                   e.max_participants, e.max_audience, e.conguide_dk, 
+                   e.conguide_en, e.venue_id
+            FROM Events e
+            WHERE e.venue_id = ?
+        """;
+
+        return jdbcTemplate.query(sql, new Object[]{venueId}, (rs, rowNum) -> {
+            Events event = new Events();
+            event.setEventId(rs.getLong("event_id"));
+            event.setTitle(rs.getString("title"));
+            event.setEventCreator(rs.getString("event_creator"));
+            event.setEventResponsible(rs.getString("event_responsible"));
+            event.setEventControl(rs.getString("event_control"));
+            event.setEventType(rs.getString("event_type"));
+            event.setDescription(rs.getString("description"));
+            event.setMaxParticipants(rs.getInt("max_participants"));
+            event.setMaxAudience(rs.getInt("max_audience"));
+            event.setConguideDk(rs.getString("conguide_dk"));
+            event.setConguideEn(rs.getString("conguide_en"));
+            event.setVenueId(rs.getLong("venue_id"));
+            return event;
+        });
+    }
 
 }
