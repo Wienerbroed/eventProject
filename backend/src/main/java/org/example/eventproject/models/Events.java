@@ -40,6 +40,9 @@ public class Events {
     @Column(name = "conguide_en", nullable = false)
     private String conguideEn;
 
+    @Column(name = "venue_id", nullable = false)
+    private String venueId;
+
     // Getters and setters
     public Long getEventId() {
         return eventId;
@@ -127,5 +130,13 @@ public class Events {
 
     public void setConguideEn(String conguideEn) {
         this.conguideEn = conguideEn;
+    }
+
+    public String getVenueId() {
+        return venueId;
+    }
+
+    public void setVenueId(String venueId) {
+        this.venueId = venueId;
     }
 }

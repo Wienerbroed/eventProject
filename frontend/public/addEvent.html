@@ -27,10 +27,10 @@
   <textarea id="description" name="description" required></textarea><br><br>
 
   <label for="maxParticipants">Max Participants:</label>
-  <input type="number" id="maxParticipants" name="maxParticipants" required><br><br>
+  <input type="number" id="maxParticipants" name="maxParticipants" min="1" required><br><br>
 
   <label for="maxAudience">Max Audience:</label>
-  <input type="number" id="maxAudience" name="maxAudience" required><br><br>
+  <input type="number" id="maxAudience" name="maxAudience" min="1" required><br><br>
 
   <label for="conguideDk">Guide (DK):</label>
   <textarea id="conguideDk" name="conguideDk" required></textarea><br><br>
@@ -38,10 +38,39 @@
   <label for="conguideEn">Guide (EN):</label>
   <textarea id="conguideEn" name="conguideEn" required></textarea><br><br>
 
+  <label for="venueSelect">Venue:</label>
+  <select id="venueSelect" name="venueSelect" required>
+    <!-- Venues will be dynamically populated here -->
+  </select>
+
   <button type="submit">Add Event</button>
 </form>
 
 <script>
+  // Function to populate venues dynamically
+  async function populateVenueDropdown() {
+    try {
+      const response = await fetch('http://localhost:3000/api/venues');
+      if (!response.ok) throw new Error('Failed to fetch venues');
+
+      const venues = await response.json();
+      const venueSelect = document.getElementById('venueSelect');
+
+      venues.forEach(venue => {
+        const option = document.createElement('option');
+        option.value = venue.venueId; // Use venue_id as the value
+        option.textContent = venue.venueName; // Display venue_name
+        venueSelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error fetching venues:', error);
+    }
+  }
+
+  // Call the function on page load
+  document.addEventListener('DOMContentLoaded', populateVenueDropdown);
+
+  // Form submission logic
   document.getElementById('addEventForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
@@ -55,7 +84,8 @@
       maxParticipants: parseInt(document.getElementById('maxParticipants').value),
       maxAudience: parseInt(document.getElementById('maxAudience').value),
       conguideDk: document.getElementById('conguideDk').value,
-      conguideEn: document.getElementById('conguideEn').value
+      conguideEn: document.getElementById('conguideEn').value,
+      venueId: document.getElementById('venueSelect').value // Correct ID
     };
 
     try {
@@ -78,7 +108,6 @@
       alert('An error occurred.');
     }
   });
-
 </script>
 </body>
 </html>
