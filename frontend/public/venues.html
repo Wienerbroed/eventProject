@@ -168,19 +168,27 @@
                 const venueElement = document.createElement('div');
                 venueElement.classList.add('venue-box');
                 venueElement.innerHTML = `
-            <h2>${venue.venueName}</h2>
-            <p><strong>Address:</strong> ${venue.venueAddress}</p>
-        `;
+                    <h2>${venue.venueName}</h2>
+                    <p><strong>Address:</strong> ${venue.venueAddress}</p>
+                    <button class="delete-btn" data-id="${venue.venueId}">Delete</button>
+                `;
 
                 // Wrap the venue box in a clickable link
                 venueElement.addEventListener('click', () => {
                     window.location.href = `eventsByVenue.html?venueId=${venue.venueId}`;
                 });
 
+                // Add event listener to the delete button
+                const deleteButton = venueElement.querySelector('.delete-btn');
+                deleteButton.addEventListener('click', async (event) => {
+                    event.stopPropagation(); // Prevent the click event from propagating to the venue box
+                    const venueId = event.target.getAttribute('data-id');
+                    await deleteVenue(venueId);
+                });
+
                 venueContainer.appendChild(venueElement);
             });
         }
-
 
 
         function viewVenueDetails(name, address) {
@@ -235,6 +243,29 @@
                 }
             });
         }
+
+
+        //Delete Venue
+        async function deleteVenue(venueId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/venues/${venueId}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete venue');
+                }
+
+                // Refresh the venue list
+                fetchVenues();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+
+
+
 
         // Initial fetch of venues
         fetchVenues();

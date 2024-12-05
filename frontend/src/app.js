@@ -220,6 +220,10 @@ app.get('/venues', (req, res) => {
 });
 
 
+app.get('/venues/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
+});
+
 
 
 // --------------------- Venue  --------------
@@ -269,6 +273,21 @@ app.post('/api/venues/add', async (req, res) => {
     }
 });
 
+// Delete an venue
+app.delete('/api/venues/:id', async (req, res) => {
+    try {
+        const venueId = req.params.id;
+        const deleteResponse = await fetch(`http://localhost:8080/api/venues/${venueId}`, { method: 'DELETE' });
+
+        if (deleteResponse.ok) {
+            res.status(204).send('Venue deleted successfully.');
+        } else {
+            res.status(deleteResponse.status).send('Failed to delete venue: ' + deleteResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error deleting venue: ' + error.message);
+    }
+});
 
 
 

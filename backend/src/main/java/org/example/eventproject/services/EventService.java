@@ -25,6 +25,7 @@ public class EventService {
         eventRepository.addEvent(event);
         return event;
     }
+
     //add event Schedule
     public int addEventSchedule(EventSchedule schedule) {
         return eventRepository.addEventSchedule(schedule);
