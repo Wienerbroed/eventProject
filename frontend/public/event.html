@@ -37,21 +37,23 @@
             const eventElement = document.createElement('div');
             eventElement.classList.add('event');
             eventElement.innerHTML = `
-                <h2 onclick="window.location.href='seeEvent.html?id=${event.eventId}'">${event.title}</h2>
-                <p><strong>Creator:</strong> ${event.eventCreator}</p>
-                <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
-                <p><strong>Control:</strong> ${event.eventControl}</p>
-                <p><strong>Type:</strong> ${event.eventType}</p>
-                <p><strong>Description:</strong> ${event.description}</p>
-                <p><strong>Max Participants:</strong> ${event.maxParticipants}</p>
-                <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
-                <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
-                <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
-                <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
-            `;
+            <h2 onclick="window.location.href='seeEvent.html?id=${event.eventId}'">${event.title}</h2>
+            <p><strong>Creator:</strong> ${event.eventCreator}</p>
+            <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
+            <p><strong>Control:</strong> ${event.eventControl}</p>
+            <p><strong>Type:</strong> ${event.eventType}</p>
+            <p><strong>Description:</strong> ${event.description}</p>
+            <p><strong>Max Participants:</strong> ${event.maxParticipants}</p>
+            <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
+            <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
+            <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
+            <p><strong>Venue:</strong> ${event.venue.venueName} (${event.venue.venueAddress})</p>
+            <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
+        `;
             eventsContainer.appendChild(eventElement);
         });
     }
+
 
     async function deleteEvent(eventId) {
         const confirmation = confirm("Are you sure you want to delete this event?");

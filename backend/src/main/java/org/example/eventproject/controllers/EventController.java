@@ -25,8 +25,8 @@ public class EventController {
 
     // Get All Events
     @GetMapping()
-    public ResponseEntity<List<Events>> getAllEvents() {
-        List<Events> events = eventService.getAllEvents();
+    public ResponseEntity<List<Events>> getAllEventsWithVenueDetails() {
+        List<Events> events = eventService.getAllEventsWithVenueDetails();
         return ResponseEntity.ok(events);
     }
 
