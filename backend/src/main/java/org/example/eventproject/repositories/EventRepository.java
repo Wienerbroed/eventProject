@@ -1,9 +1,6 @@
 package org.example.eventproject.repositories;
 
-import org.example.eventproject.models.EventExpenses;
-import org.example.eventproject.models.EventRequirements;
-import org.example.eventproject.models.EventSchedule;
-import org.example.eventproject.models.Events;
+import org.example.eventproject.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -25,8 +22,8 @@ public class EventRepository {
 
     // Add Event
     public int addEvent(Events event) {
-        String sql = "INSERT INTO Events (title, event_creator, event_responsible, event_control, event_type, description, max_participants, max_audience, conguide_dk, conguide_en) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn());
+        String sql = "INSERT INTO Events (title, event_creator, event_responsible, event_control, event_type, description, max_participants, max_audience, conguide_dk, conguide_en, venue_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(), event.getVenueId());
     }
 
     // Find Event by ID
@@ -45,6 +42,46 @@ public class EventRepository {
         String sql = "SELECT * FROM events";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Events.class));
     }
+
+
+    public List<Events> getAllEventsWithVenueDetails() {
+        String sql = """
+    SELECT e.event_id, e.title, e.event_creator, e.event_responsible, 
+           e.event_control, e.event_type, e.description, 
+           e.max_participants, e.max_audience, e.conguide_dk, 
+           e.conguide_en, v.venue_id, v.venue_name, v.venue_address
+    FROM Events e
+    JOIN venue v ON e.venue_id = v.venue_id
+    """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            // Create a new Event instance
+            Events event = new Events();
+            event.setEventId(rs.getLong("event_id"));
+            event.setTitle(rs.getString("title"));
+            event.setEventCreator(rs.getString("event_creator"));
+            event.setEventResponsible(rs.getString("event_responsible"));
+            event.setEventControl(rs.getString("event_control"));
+            event.setEventType(rs.getString("event_type"));
+            event.setDescription(rs.getString("description"));
+            event.setMaxParticipants(rs.getInt("max_participants"));
+            event.setMaxAudience(rs.getInt("max_audience"));
+            event.setConguideDk(rs.getString("conguide_dk"));
+            event.setConguideEn(rs.getString("conguide_en"));
+
+            // Create a Venue instance and set it to the Event
+            Venue venue = new Venue();
+            venue.setVenueId(rs.getLong("venue_id"));
+            venue.setVenueName(rs.getString("venue_name"));
+            venue.setVenueAddress(rs.getString("venue_address"));
+
+            // Set the venue in the event object
+            event.setVenue(venue);
+
+            return event;
+        });
+    }
+
 
     // Delete event by ID
     public int deleteById(Long id) {
@@ -75,9 +112,36 @@ public class EventRepository {
     }
 
     public int updateEvent(Events event) {
-        String sql = "UPDATE events SET title = ?, event_creator = ?, event_responsible = ?, event_control = ?, event_type = ?, description = ?, max_participants = ?, max_audience = ?, conguide_dk = ?, conguide_en = ? WHERE event_id = ?";
-        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(), event.getEventId());
+        String sql = "UPDATE events SET title = ?, event_creator = ?, event_responsible = ?, event_control = ?, event_type = ?, description = ?, max_participants = ?, max_audience = ?, conguide_dk = ?, conguide_en = ?, venue_id = ? WHERE event_id = ?";
+        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(),event.getVenueId(), event.getEventId());
     }
 
+    public List<Events> getEventsByVenueId(Long venueId) {
+        String sql = """
+            SELECT e.event_id, e.title, e.event_creator, e.event_responsible, 
+                   e.event_control, e.event_type, e.description, 
+                   e.max_participants, e.max_audience, e.conguide_dk, 
+                   e.conguide_en, e.venue_id
+            FROM Events e
+            WHERE e.venue_id = ?
+        """;
+
+        return jdbcTemplate.query(sql, new Object[]{venueId}, (rs, rowNum) -> {
+            Events event = new Events();
+            event.setEventId(rs.getLong("event_id"));
+            event.setTitle(rs.getString("title"));
+            event.setEventCreator(rs.getString("event_creator"));
+            event.setEventResponsible(rs.getString("event_responsible"));
+            event.setEventControl(rs.getString("event_control"));
+            event.setEventType(rs.getString("event_type"));
+            event.setDescription(rs.getString("description"));
+            event.setMaxParticipants(rs.getInt("max_participants"));
+            event.setMaxAudience(rs.getInt("max_audience"));
+            event.setConguideDk(rs.getString("conguide_dk"));
+            event.setConguideEn(rs.getString("conguide_en"));
+            event.setVenueId(rs.getLong("venue_id"));
+            return event;
+        });
+    }
 
 }

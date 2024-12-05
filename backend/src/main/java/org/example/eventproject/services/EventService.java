@@ -42,6 +42,13 @@ public class EventService {
         return eventRepository.findAll();
     }
 
+    // Service method to fetch all events with venue details
+    public List<Events> getAllEventsWithVenueDetails() {
+        // Call the repository method to fetch events with venue details
+        return eventRepository.getAllEventsWithVenueDetails();
+    }
+
+
     // Delete Event
     public void deleteEvent(Long eventId) {
         if (!eventRepository.existsById(eventId)) {
@@ -60,6 +67,10 @@ public class EventService {
     }
 
 
+
+    public List<Events> getEventsByVenueId(Long venueId) {
+        return eventRepository.getEventsByVenueId(venueId);
+    }
 
 
 

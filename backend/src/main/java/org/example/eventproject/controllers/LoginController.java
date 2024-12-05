@@ -6,15 +6,20 @@ import org.example.eventproject.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+
+@RestController
+@RequestMapping("api/loginAndRegister")
 public class LoginController {
 
     @Autowired
     private LoginService loginService;
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "loginAndRegisterPage";
+    }
 
 
     @PostMapping("/register")
@@ -32,16 +37,5 @@ public class LoginController {
         }
     }
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "loginAndRegisterPage";
-    }
 
-    public boolean isValidUser(String username, String password) {
-        return loginService.isValidUser(username, password);
-    }
-
-    public boolean existsByUsername(String username) {
-        return loginService.existsByUsername(username);
-    }
 }

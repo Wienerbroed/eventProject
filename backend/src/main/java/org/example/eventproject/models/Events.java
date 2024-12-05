@@ -40,6 +40,14 @@ public class Events {
     @Column(name = "conguide_en", nullable = false)
     private String conguideEn;
 
+    @Column(name = "venue_id", nullable = false)
+    private Long venueId;  // This is the foreign key field
+
+    // Use @ManyToOne to define the relationship with the Venue entity
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venue_id", referencedColumnName = "venue_id", insertable = false, updatable = false)
+    private Venue venue;
+
     // Getters and setters
     public Long getEventId() {
         return eventId;
@@ -127,5 +135,22 @@ public class Events {
 
     public void setConguideEn(String conguideEn) {
         this.conguideEn = conguideEn;
+    }
+
+    // Getter and setter for venue relationship
+    public Venue getVenue() {
+        return venue;
+    }
+
+    public void setVenue(Venue venue) {
+        this.venue = venue;
+    }
+
+    public Long getVenueId() {
+        return venueId;
+    }
+
+    public void setVenueId(Long venueId) {
+        this.venueId = venueId;
     }
 }

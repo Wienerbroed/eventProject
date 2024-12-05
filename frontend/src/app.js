@@ -39,6 +39,10 @@ app.get('/events/:id', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'seeEvent.html'));
 });
 
+
+
+//------------------------EVENT---------------------------
+
 app.get('/addEventSchedule', (req, res) => {
     const eventId = req.query.eventId;  // Access the eventId from the query string
     console.log('Event ID:', eventId);  // You can use this ID to fetch event details or perform other actions
@@ -123,6 +127,36 @@ app.post('/api/events/:id', async (req, res) => {
         res.status(500).send('Error updating event: ' + error.message);
     }
 });
+// Fetch a specific event by ID
+app.get('/api/events/:id', async (req, res) => {
+    const eventId = req.params.id;
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}`);
+        const event = await response.json();
+        res.json(event);
+    } catch (error) {
+        res.status(500).send('Error fetching activity: ' + error.message);
+    }
+});
+app.get('/api/events/venue/:venueId', async (req, res) => {
+    const venueId = req.params.venueId; // Get the venueId from the URL parameter
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/venue/${venueId}`);
+        const events = await response.json();
+        if (!events) {
+            return res.status(404).json({ message: "No events found for this venue" });
+        }
+        res.json(events);
+    } catch (error) {
+        console.error("Error fetching events by venue:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
+//------------------------login and registre---------------------------
+
 
 // Serve `loginAndRegisterPage.html` at `/loginAndRegisterPage` route
 app.get('/loginAndRegisterPage', (req, res) => {
@@ -174,8 +208,71 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Serve events page
-app.get('/events', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
+
+
+
+
+// ---------- Venue Routes ----------
+
+// Serve `venues.html` at the `/venues` route
+app.get('/venues', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
 });
+
+
+
+
+// --------------------- Venue  --------------
+
+// Fetch events from the backend API
+app.get('/api/venues', async (req, res) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/venues');
+        const venues = await response.json();
+        res.json(venues);
+    } catch (error) {
+        res.status(500).send('Error fetching venues: ' + error.message);
+    }
+});
+
+// Fetch a specific event by ID'
+app.get('/api/venues/:id', async (req, res) => {
+    const venueId = req.params.id;
+    try {
+        const response = await fetch(`http://localhost:8080/api/venues/${venueId}`);
+        const venue = await response.json();
+        res.json(venue);
+    } catch (error) {
+        res.status(500).send('Error fetching venue: ' + error.message);
+    }
+});
+
+// Add a new venue
+app.post('/api/venues/add', async (req, res) => {
+    try {
+        const venueData = req.body;
+        const postResponse = await fetch('http://localhost:8080/api/venues/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(venueData)
+        });
+
+        if (postResponse.ok) {
+            const jsonResponse = await postResponse.json(); // Ensure the response is parsed as JSON
+            res.status(201).json({ message: 'Venue added successfully', data: jsonResponse });
+        } else {
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).json({ error: 'Failed to add venue', message: errorText });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error adding venue', message: error.message });
+    }
+});
+
+
+
+
+
+
+
 

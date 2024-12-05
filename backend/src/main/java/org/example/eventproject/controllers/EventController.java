@@ -25,8 +25,8 @@ public class EventController {
 
     // Get All Events
     @GetMapping()
-    public ResponseEntity<List<Events>> getAllEvents() {
-        List<Events> events = eventService.getAllEvents();
+    public ResponseEntity<List<Events>> getAllEventsWithVenueDetails() {
+        List<Events> events = eventService.getAllEventsWithVenueDetails();
         return ResponseEntity.ok(events);
     }
 
@@ -38,7 +38,7 @@ public class EventController {
         return ResponseEntity.ok(createdEvent);
     }
 
-    // Add Event Schedule
+   /* // Add Event Schedule
     @PostMapping("/addSchedule/{eventId}")
     public ResponseEntity<EventSchedule> addEventSchedule(@PathVariable Long eventId, @RequestBody EventSchedule schedule) {
         // Ensure the schedule is associated with the eventId
@@ -52,7 +52,7 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(null); // Optionally return null or error details
         }
-    }
+    }*/
 
 
 
@@ -75,6 +75,15 @@ public class EventController {
         event.setEventId(eventId);
         Events updatedEvent = eventService.updateEvent(event);
         return ResponseEntity.ok(updatedEvent);
+    }
+
+    @GetMapping("/venue/{venueId}")
+    public ResponseEntity<List<Events>> getEventsByVenue(@PathVariable Long venueId) {
+        List<Events> events = eventService.getEventsByVenueId(venueId);
+        if (events.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(events);
     }
 
 
