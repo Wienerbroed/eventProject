@@ -230,14 +230,17 @@ app.post('/api/venues/add', async (req, res) => {
         });
 
         if (postResponse.ok) {
-            res.status(201).send('Venue added successfully.');
+            const jsonResponse = await postResponse.json(); // Ensure the response is parsed as JSON
+            res.status(201).json({ message: 'Venue added successfully', data: jsonResponse });
         } else {
-            res.status(postResponse.status).send('Failed to add Venue: ' + postResponse.statusText);
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).json({ error: 'Failed to add venue', message: errorText });
         }
     } catch (error) {
-        res.status(500).send('Error adding venue: ' + error.message);
+        res.status(500).json({ error: 'Error adding venue', message: error.message });
     }
 });
+
 
 
 

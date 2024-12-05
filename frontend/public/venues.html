@@ -84,119 +84,128 @@
 </div>
 
 <script>
-    // Get the modals
-    var addVenueModal = document.getElementById("addVenueModal");
-    var viewVenueModal = document.getElementById("viewVenueModal");
+    // Wrap everything inside the DOMContentLoaded event to ensure the DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the modals
+        var addVenueModal = document.getElementById("addVenueModal");
+        var viewVenueModal = document.getElementById("viewVenueModal");
 
-    // Get the buttons that open the modals
-    var addBtn = document.getElementById("addVenueBtn");
+        // Get the buttons that open the modals
+        var addBtn = document.getElementById("addVenueBtn");
 
-    // Get the <span> elements that close the modals
-    var addSpan = addVenueModal.getElementsByClassName("close")[0];
-    var viewSpan = viewVenueModal.getElementsByClassName("close")[0];
+        // Get the <span> elements that close the modals
+        var addSpan = addVenueModal.getElementsByClassName("close")[0];
+        var viewSpan = viewVenueModal.getElementsByClassName("close")[0];
 
-    // When the user clicks the button, open the add venue modal
-    addBtn.onclick = function() {
-        addVenueModal.style.display = "block";
-    }
+        // When the user clicks the button, open the add venue modal
+        addBtn.onclick = function () {
+            addVenueModal.style.display = "block";
+        }
 
-    // When the user clicks on <span> (x), close the modals
-    addSpan.onclick = function() {
-        addVenueModal.style.display = "none";
-    }
-    viewSpan.onclick = function() {
-        viewVenueModal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modals, close them
-    window.onclick = function(event) {
-        if (event.target == addVenueModal) {
+        // When the user clicks on <span> (x), close the modals
+        addSpan.onclick = function () {
             addVenueModal.style.display = "none";
         }
-        if (event.target == viewVenueModal) {
+        viewSpan.onclick = function () {
             viewVenueModal.style.display = "none";
         }
-    }
 
-    // Fetch venues and display them
-    async function fetchVenues() {
-        try {
-            const response = await fetch('http://localhost:3000/api/venues');
-            if (!response.ok) {
-                throw new Error('Failed to fetch venues');
+        // When the user clicks anywhere outside of the modals, close them
+        window.onclick = function (event) {
+            if (event.target == addVenueModal) {
+                addVenueModal.style.display = "none";
             }
-            const venues = await response.json();
-            displayVenues(venues);
-        } catch (error) {
-            console.error('Error:', error);
+            if (event.target == viewVenueModal) {
+                viewVenueModal.style.display = "none";
+            }
         }
-    }
 
-    function displayVenues(venues) {
-        const venueContainer = document.getElementById('venueContainer');
-        venueContainer.innerHTML = '';
+        // Fetch venues and display them
+        async function fetchVenues() {
+            try {
+                const response = await fetch('http://localhost:3000/api/venues');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch venues');
+                }
+                const venues = await response.json();
+                displayVenues(venues);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
-        venues.forEach(venue => {
-            const venueElement = document.createElement('div');
-            venueElement.classList.add('venue');
-            venueElement.innerHTML = `
-                <h2>${venue.venueName}</h2>
-                <p><strong>Address:</strong> ${venue.venueAddress}</p>
-                <button class="view-btn" onclick="viewVenueDetails('${venue.venueName}', '${venue.venueAddress}')">View Details</button>
-            `;
-            venueContainer.appendChild(venueElement);
-        });
-    }
+        function displayVenues(venues) {
+            const venueContainer = document.getElementById('venueContainer');
+            venueContainer.innerHTML = '';
 
-    function viewVenueDetails(name, address) {
-        document.getElementById('venueName').innerText = name;
-        document.getElementById('venueAddress').innerText = address;
-        viewVenueModal.style.display = "block";
-    }
-
-    // Handle add venue form submission
-    const addVenueForm = document.getElementById('addVenueForm');
-    addVenueForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevent the default form submission
-
-        const venueName = document.getElementById('venueNavn').value;
-        const venueAddress = document.getElementById('venueAdresse').value;
-
-        try {
-            const response = await fetch('http://localhost:3000/api/venues/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    venueName: venueName,
-                    venueAddress: venueAddress,
-                }),
+            venues.forEach(venue => {
+                const venueElement = document.createElement('div');
+                venueElement.classList.add('venue');
+                venueElement.innerHTML = `
+                    <h2>${venue.venueName}</h2>
+                    <p><strong>Address:</strong> ${venue.venueAddress}</p>
+                    <button class="view-btn" onclick="viewVenueDetails('${venue.venueName}', '${venue.venueAddress}')">View Details</button>
+                `;
+                venueContainer.appendChild(venueElement);
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to add venue');
-            }
-
-            const result = await response.json();
-            console.log('Venue added:', result);
-
-            // Close the modal
-            addVenueModal.style.display = 'none';
-
-            // Clear the form
-            addVenueForm.reset();
-
-            // Refresh the venue list
-            fetchVenues();
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('addVenueError').innerText = 'Failed to add venue. Please try again.';
         }
-    });
 
-    // Initial fetch of venues
-    fetchVenues();
+        function viewVenueDetails(name, address) {
+            document.getElementById('venueName').innerText = name;
+            document.getElementById('venueAddress').innerText = address;
+            viewVenueModal.style.display = "block";
+        }
+
+        // Ensure addVenueForm is correctly initialized after DOM is loaded
+        const addVenueForm = document.getElementById('addVenueForm');
+        if (addVenueForm) {
+            addVenueForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent the default form submission
+
+                const venueName = document.getElementById('venueNavn').value;
+                const venueAddress = document.getElementById('venueAdresse').value;
+
+                const errorElement = document.getElementById('addVenueError');
+                errorElement.innerText = ''; // Clear previous error messages
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/venues/add', { // Corrected URL
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            venueName: venueName,
+                            venueAddress: venueAddress,
+                        }),
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Venue added:', result);
+
+                        // Close the modal
+                        addVenueModal.style.display = 'none';
+
+                        // Clear the form
+                        addVenueForm.reset();
+
+                        // Refresh the venue list
+                        fetchVenues();
+                    } else {
+                        // If the response status is not OK, show an error message
+                        throw new Error('Failed to add venue');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorElement.innerText = 'Failed to add venue. Please try again.';
+                }
+            });
+        }
+
+        // Initial fetch of venues
+        fetchVenues();
+    });
 </script>
 
 </body>
