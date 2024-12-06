@@ -17,10 +17,6 @@ public class LoginRepo {
     }
 
 
-    /*public void registerUser(String username, String password, String email) {
-        String insertQuery = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";
-        jdbcTemplate.update(insertQuery, username, password, email);
-    }*/
 
     public int registerUser(UserLogin userLogin) {
         String sql = "INSERT INTO login (username, password, email) VALUES (?, ?, ?)";

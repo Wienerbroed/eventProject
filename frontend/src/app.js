@@ -169,7 +169,7 @@ app.post('/api/register', async (req, res) => {
         const { username, password, email } = req.body;
 
         // Forward the data to the Spring Boot API
-        const response = await fetch('http://localhost:8080/register', {
+        const response = await fetch('http://localhost:8080/api/loginAndRegister/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password, email })
@@ -191,7 +191,7 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     try {
         const loginData = req.body;
-        const response = await fetch('http://localhost:8080/login', {
+        const response = await fetch('http://localhost:8080/api/loginAndRegister/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(loginData)
