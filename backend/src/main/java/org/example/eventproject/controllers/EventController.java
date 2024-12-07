@@ -38,21 +38,17 @@ public class EventController {
         return ResponseEntity.ok(createdEvent);
     }
 
-   /* // Add Event Schedule
     @PostMapping("/addSchedule/{eventId}")
-    public ResponseEntity<EventSchedule> addEventSchedule(@PathVariable Long eventId, @RequestBody EventSchedule schedule) {
-        // Ensure the schedule is associated with the eventId
-        schedule.setEventId(eventId);
-
-        int result = eventService.addEventSchedule(schedule);
-
-        if (result == 1) {
-            return ResponseEntity.ok(schedule);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null); // Optionally return null or error details
+    public ResponseEntity<String> addEventSchedule(@PathVariable Long eventId, @RequestBody EventSchedule schedule) {
+        try {
+            System.out.println("Received schedule: " + schedule); // Add logging
+            schedule.setEventId(eventId);
+            eventService.addEventSchedule(schedule);
+            return ResponseEntity.ok("Schedule added successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding schedule: " + e.getMessage());
         }
-    }*/
+    }
 
 
 
@@ -86,6 +82,16 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+    @GetMapping("/{eventId}/schedule")
+    public List<EventSchedule> getEventSchedule(@PathVariable Long eventId) {
+        return eventService.getEventSchedule(eventId);
+    }
+
+
+    @DeleteMapping("/schedule/{scheduleId}")
+    public void deleteSchedule(@PathVariable Long scheduleId) {
+        eventService.deleteSchedule(scheduleId);
+    }
 
 
 }

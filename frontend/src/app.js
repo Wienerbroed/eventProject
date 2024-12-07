@@ -106,6 +106,22 @@ app.delete('/api/events/:id', async (req, res) => {
         res.status(500).send('Error deleting event: ' + error.message);
     }
 });
+// Delete a schedule
+app.delete('/api/events/schedule/:scheduleId', async (req, res) => {
+    try {
+        const scheduleId = req.params.scheduleId;
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/schedule/${scheduleId}`, { method: 'DELETE' });
+
+        if (deleteResponse.ok) {
+            res.status(204).send('Schedule deleted successfully.');
+        } else {
+            res.status(deleteResponse.status).send('Failed to delete schedule: ' + deleteResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error deleting schedule: ' + error.message);
+    }
+});
+
 // Update an existing event
 app.post('/api/events/:id', async (req, res) => {
     try {
@@ -135,9 +151,47 @@ app.get('/api/events/:id', async (req, res) => {
         const event = await response.json();
         res.json(event);
     } catch (error) {
-        res.status(500).send('Error fetching activity: ' + error.message);
+        res.status(500).send('Error fetching event: ' + error.message);
     }
 });
+// Fetch a specific event schedule by ID
+app.get('/api/events/:eventId/schedule', async (req, res) => {
+    const eventId = req.params.eventId;
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}/schedule`);
+        const eventSchedule = await response.json();
+        res.json(eventSchedule);
+    } catch (error) {
+        res.status(500).send('Error fetching event schedule: ' + error.message);
+    }
+});
+
+app.post('/api/events/addSchedule/:eventId', async (req, res) => {
+    try {
+        const eventId = req.params.eventId; // Get the eventId from the URL
+        const scheduleData = req.body; // Get the schedule data from the request body
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/addSchedule/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(scheduleData),
+        });
+
+        if (postResponse.ok) {
+            res.status(201).send('Schedule added successfully.');
+        } else {
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).send('Failed to add schedule: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error adding schedule: ' + error.message);
+    }
+});
+
+
+
+
+
 app.get('/api/events/venue/:venueId', async (req, res) => {
     const venueId = req.params.venueId; // Get the venueId from the URL parameter
 

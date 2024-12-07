@@ -82,6 +82,10 @@ public class EventRepository {
         });
     }
 
+    public int deleteScheduleById(Long scheduleId) {
+        String sql = "DELETE FROM EventSchedule WHERE schedule_id = ?";
+        return jdbcTemplate.update(sql, scheduleId);
+    }
 
     // Delete event by ID
     public int deleteById(Long id) {
@@ -108,7 +112,12 @@ public class EventRepository {
 
     public int addEventSchedule(EventSchedule schedule) {
         String sql = "INSERT INTO EventSchedule (event_id, schedule_date, start_time, end_time) VALUES (?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, schedule.getEvent().getEventId(), schedule.getScheduleDate(), schedule.getStartTime(), schedule.getEndTime());
+        return jdbcTemplate.update(sql, schedule.getEventId(), schedule.getScheduleDate(), schedule.getStartTime(), schedule.getEndTime());
+    }
+
+    public List<EventSchedule> findScheduleByEventId(Long eventId) {
+        String sql = "SELECT * FROM EventSchedule WHERE event_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{eventId}, new BeanPropertyRowMapper<>(EventSchedule.class));
     }
 
     public int updateEvent(Events event) {

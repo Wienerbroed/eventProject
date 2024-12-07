@@ -79,6 +79,54 @@
                 grid-column: 1;
             }
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 5px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Schedule item styling */
+        .schedule-item {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -87,12 +135,37 @@
 </header>
 <div id="eventDetailsContainer"></div>
 
+<!-- Schedule Display -->
+<div id="scheduleList" style="margin: 1rem auto; padding: 1rem; max-width: 800px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+    <h2>Schedule</h2>
+</div>
 
-
+<!-- Add Schedule Button -->
 <div class="button-container">
-    <button onclick="window.location.href=`/addEventSchedule?eventId=${document.getElementById('eventId').value}`">
-        Add Schedule
-    </button>
+    <button id="addScheduleBtn">Add Schedule</button>
+</div>
+
+<!-- Modal -->
+<div id="scheduleModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Schedule</h2>
+        <form id="scheduleForm">
+            <div>
+                <label for="scheduleDate">Date:</label>
+                <input type="date" id="scheduleDate" name="scheduleDate" required>
+            </div>
+            <div>
+                <label for="startTime">Start Time:</label>
+                <input type="time" id="startTime" name="startTime" required>
+            </div>
+            <div>
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime" name="endTime" required>
+            </div>
+            <button type="submit">Add Schedule</button>
+        </form>
+    </div>
 </div>
 
 <form id="updateEventForm">
@@ -152,6 +225,55 @@
 </form>
 
 <script>
+    // Get modal elements
+    const modal = document.getElementById('scheduleModal');
+    const btn = document.getElementById('addScheduleBtn');
+    const closeBtn = document.querySelector('.close');
+
+    // Open modal on button click
+    btn.onclick = function () {
+        modal.style.display = 'block';
+    };
+
+    // Close modal on close button click
+    closeBtn.onclick = function () {
+        modal.style.display = 'none';
+    };
+
+    // Close modal when clicking outside of it
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    // Handle form submission
+    document.getElementById('scheduleForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const eventId = urlParams.get('id'); // Use the event ID from the URL parameters
+        const scheduleData = {
+            date: document.getElementById('scheduleDate').value,
+            startTime: document.getElementById('startTime').value,
+            endTime: document.getElementById('endTime').value,
+        };
+
+        fetch(`http://localhost:3000/api/events/addSchedule/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(scheduleData),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    alert('Schedule added successfully!');
+                    modal.style.display = 'none';
+                } else {
+                    alert('Failed to add schedule.');
+                }
+            })
+            .catch((error) => console.error('Error:', error));
+    });
+
     async function fetchEventDetails(eventId) {
         try {
             const response = await fetch(`http://localhost:3000/api/events/${eventId}`);
@@ -197,15 +319,58 @@
 
         try {
             const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
-                method: 'POST',
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedEvent)
             });
 
+            if (!response.ok) {
+                throw new Error('Failed to update event');
+            }
+            alert('Event updated successfully');
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function fetchEventSchedule(eventId) {
+        fetch(`http://localhost:3000/api/events/${eventId}/schedule`)
+            .then((response) => response.json())
+            .then((schedule) => displayEventSchedule(schedule))
+            .catch((error) => console.error('Error:', error));
+    }
+
+    function displayEventSchedule(schedule) {
+        const scheduleList = document.getElementById('scheduleList');
+        scheduleList.innerHTML = ''; // Clear existing schedule
+
+        schedule.forEach(item => {
+            const scheduleItem = document.createElement('div');
+            scheduleItem.className = 'schedule-item';
+            scheduleItem.innerHTML = `
+            <p><strong>Date:</strong> ${item.date}</p>
+            <p><strong>Start Time:</strong> ${item.startTime}</p>
+            <p><strong>End Time:</strong> ${item.endTime}</p>
+            <button class="delete-btn" onclick="deleteSchedule(${item.scheduleId})">Delete</button>
+        `;
+            scheduleList.appendChild(scheduleItem);
+        });
+    }
+
+    async function deleteSchedule(scheduleId) {
+        const confirmation = confirm("Are you sure you want to delete this schedule?");
+        if (!confirmation) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/events/schedule/${scheduleId}`, {
+                method: 'DELETE'
+            });
+
             if (response.ok) {
-                alert('Event updated successfully!');
+                alert('Schedule deleted successfully!');
+                fetchEvents(); // Refresh the event list after deletion
             } else {
-                alert('Failed to update event.');
+                alert('Failed to delete schedule.');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -213,19 +378,25 @@
         }
     }
 
-    // Get the event ID from the URL
+
+
+
+
+
+
+
+
+
+
+
+
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('id');
 
-    // Fetch and display event details when the page loads
     if (eventId) {
         fetchEventDetails(eventId);
-    } else {
-        console.error('Event ID not found in URL');
+        fetchEventSchedule(eventId);
     }
-
-    // Add event listener to the form
-    document.getElementById('updateEventForm').addEventListener('submit', updateEvent);
 </script>
 </body>
 </html>

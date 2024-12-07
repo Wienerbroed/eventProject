@@ -74,6 +74,13 @@ public class EventService {
     }
 
 
+    public List<EventSchedule> getEventSchedule(Long eventId) {
+        return eventRepository.findScheduleByEventId(eventId);
+    }
+
+    public void deleteSchedule(Long scheduleId) {
+        eventRepository.deleteScheduleById(scheduleId);
+    }
 
 
 }

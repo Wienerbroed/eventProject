@@ -13,9 +13,9 @@ public class EventSchedule {
     @Column(name = "schedule_id")
     private Long scheduleId;
 
-    @ManyToOne
+
     @JoinColumn(name = "event_id", nullable = false)
-    private Events event;
+    private Long eventId;
 
     @Column(name = "schedule_date")
     private LocalDate scheduleDate;
@@ -35,12 +35,12 @@ public class EventSchedule {
         this.scheduleId = scheduleId;
     }
 
-    public Events getEvent() {
-        return event;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setEvent(Events event) {
-        this.event = event;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     public LocalDate getScheduleDate() {
@@ -65,5 +65,17 @@ public class EventSchedule {
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "EventSchedule{" +
+                "eventId=" + eventId +
+                ", scheduleDate=" + scheduleDate +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                '}';
     }
 }
