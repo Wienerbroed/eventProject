@@ -253,7 +253,7 @@
 
         const eventId = urlParams.get('id'); // Use the event ID from the URL parameters
         const scheduleData = {
-            date: document.getElementById('scheduleDate').value,
+            scheduleDate: document.getElementById('scheduleDate').value,
             startTime: document.getElementById('startTime').value,
             endTime: document.getElementById('endTime').value,
         };
@@ -267,6 +267,7 @@
                 if (response.ok) {
                     alert('Schedule added successfully!');
                     modal.style.display = 'none';
+                    fetchEventSchedule(eventId);
                 } else {
                     alert('Failed to add schedule.');
                 }
@@ -348,7 +349,7 @@
             const scheduleItem = document.createElement('div');
             scheduleItem.className = 'schedule-item';
             scheduleItem.innerHTML = `
-            <p><strong>Date:</strong> ${item.date}</p>
+            <p><strong>Date:</strong> ${item.scheduleDate}</p>
             <p><strong>Start Time:</strong> ${item.startTime}</p>
             <p><strong>End Time:</strong> ${item.endTime}</p>
             <button class="delete-btn" onclick="deleteSchedule(${item.scheduleId})">Delete</button>
@@ -368,13 +369,12 @@
 
             if (response.ok) {
                 alert('Schedule deleted successfully!');
-                fetchEvents(); // Refresh the event list after deletion
+                fetchEventSchedule(eventId); // Refresh the event list after deletion
             } else {
                 alert('Failed to delete schedule.');
             }
         } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred.');
+
         }
     }
 
