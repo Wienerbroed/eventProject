@@ -1,4 +1,4 @@
-package org.example.eventproject.models;
+package main.java.org.example.eventproject.models;
 
 
 import jakarta.persistence.*;
@@ -43,6 +43,8 @@ public class Venue {
     public void setVenueAddress(String venueAddress) {
         this.venueAddress = venueAddress;
     }
+
+
 
 
 

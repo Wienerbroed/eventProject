@@ -1,4 +1,4 @@
-package org.example.eventproject.models;
+package main.java.org.example.eventproject.models;
 
 import jakarta.persistence.*;
 
@@ -40,13 +40,13 @@ public class Events {
     @Column(name = "conguide_en", nullable = false)
     private String conguideEn;
 
-    @Column(name = "venue_id", nullable = false)
-    private Long venueId;  // This is the foreign key field
+    @Column(name = "eventRoom_id", nullable = false)
+    private Long eventRoomId;  // This is the foreign key field
 
     // Use @ManyToOne to define the relationship with the Venue entity
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "venue_id", referencedColumnName = "venue_id", insertable = false, updatable = false)
-    private Venue venue;
+    @JoinColumn(name = "eventRoom_Id", referencedColumnName = "eventRoom_Id", insertable = false, updatable = false)
+    private EventRoom eventRoom;
 
     // Getters and setters
     public Long getEventId() {
@@ -138,19 +138,19 @@ public class Events {
     }
 
     // Getter and setter for venue relationship
-    public Venue getVenue() {
-        return venue;
+    public EventRoom getEventRoom() {
+        return eventRoom;
     }
 
-    public void setVenue(Venue venue) {
-        this.venue = venue;
+    public void setEventRoom(EventRoom eventRoom) {
+        this.eventRoom = eventRoom;
     }
 
-    public Long getVenueId() {
-        return venueId;
+    public Long getEventRoomId() {
+        return eventRoomId;
     }
 
-    public void setVenueId(Long venueId) {
-        this.venueId = venueId;
+    public void setEventRoomId(Long eventRoomId) {
+        this.eventRoomId = eventRoomId;
     }
 }

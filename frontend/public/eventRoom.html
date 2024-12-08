@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Rooms</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    .event-room-container {
+      margin: 2rem;
+      padding: 1rem;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .event-room-container h2 {
+      font-size: 24px;
+    }
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem;
+      border: none;
+      cursor: pointer;
+      margin: 1rem 0;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+    .delete-btn {
+      background-color: #f44336;
+    }
+    .delete-btn:hover {
+      background-color: #d32f2f;
+    }
+    .hidden {
+      display: none;
+    }
+    .event-room-item {
+      background-color: #f4f4f4;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Event Rooms</h1>
+</header>
+
+<div class="event-room-container">
+  <!-- Add Event Room button (Always visible) -->
+  <button id="addEventRoomBtn" class="btn">Add Event Room</button>
+
+  <!-- Event Rooms list -->
+  <div id="eventRoomsList"></div>
+</div>
+
+<!-- The event room form (hidden initially) -->
+<div id="eventRoomForm" class="hidden">
+  <h2>Add Event Room</h2>
+  <label for="roomName">Room Name:</label>
+  <input type="text" id="roomName" name="roomName" required><br><br>
+
+  <label for="floor">Floor:</label>
+  <input type="text" id="floor" name="floor" required><br><br>
+
+  <button id="saveRoomBtn" class="btn">Save</button>
+  <button id="cancelBtn" class="btn">Cancel</button>
+</div>
+
+<script>
+  // Event Rooms Data
+  let eventRooms = [];
+
+  // Get the necessary DOM elements
+  const addEventRoomBtn = document.getElementById('addEventRoomBtn');
+  const eventRoomForm = document.getElementById('eventRoomForm');
+  const saveRoomBtn = document.getElementById('saveRoomBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const eventRoomsList = document.getElementById('eventRoomsList');
+
+  let editingRoomIndex = -1; // Track index of event room being edited
+
+  // Show the event room form for adding
+  addEventRoomBtn.addEventListener('click', () => {
+    eventRoomForm.classList.remove('hidden');
+  });
+
+  // Save event room (either add or update)
+  saveRoomBtn.addEventListener('click', () => {
+    const roomName = document.getElementById('roomName').value;
+    const floor = document.getElementById('floor').value;
+
+    if (editingRoomIndex === -1) {
+      // Add new event room
+      eventRooms.push({ id: eventRooms.length + 1, name: roomName, floor: floor });
+    } else {
+      // Update existing event room
+      eventRooms[editingRoomIndex] = { ...eventRooms[editingRoomIndex], name: roomName, floor: floor };
+      editingRoomIndex = -1; // Reset for new additions
+    }
+
+    // Clear the form and hide it
+    document.getElementById('roomName').value = '';
+    document.getElementById('floor').value = '';
+    eventRoomForm.classList.add('hidden');
+
+    renderEventRooms(); // Refresh the event rooms list
+  });
+
+  // Cancel button - Hide the form without saving
+  cancelBtn.addEventListener('click', () => {
+    eventRoomForm.classList.add('hidden');
+  });
+
+  // Render event rooms list
+  function renderEventRooms() {
+    eventRoomsList.innerHTML = '';
+
+    if (eventRooms.length === 0) {
+      eventRoomsList.innerHTML = '<p>No event rooms available.</p>';
+      return;
+    }
+
+    eventRooms.forEach((room, index) => {
+      const roomItem = document.createElement('div');
+      roomItem.classList.add('event-room-item');
+      roomItem.innerHTML = `
+                <span><strong>Room:</strong> ${room.name}, <strong>Floor:</strong> ${room.floor}</span>
+                <div>
+                    <button class="btn" onclick="editEventRoom(${index})">Update</button>
+                    <button class="delete-btn" onclick="deleteEventRoom(${index})">Delete</button>
+                </div>
+            `;
+      eventRoomsList.appendChild(roomItem);
+    });
+  }
+
+  // Edit event room
+  function editEventRoom(index) {
+    const room = eventRooms[index];
+    document.getElementById('roomName').value = room.name;
+    document.getElementById('floor').value = room.floor;
+    eventRoomForm.classList.remove('hidden');
+    editingRoomIndex = index; // Set the index for updating
+  }
+
+  // Delete event room
+  function deleteEventRoom(index) {
+    eventRooms.splice(index, 1);
+    renderEventRooms(); // Refresh the event rooms list
+  }
+
+  // Initial render
+  renderEventRooms();
+</script>
+
+</body>
+</html>

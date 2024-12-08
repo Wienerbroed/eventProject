@@ -1,4 +1,4 @@
-package org.example.eventproject.controllers;
+package main.java.org.example.eventproject.controllers;
 
 import org.example.eventproject.models.Events;
 import org.example.eventproject.models.UserLogin;

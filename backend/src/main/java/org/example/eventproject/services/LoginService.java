@@ -1,4 +1,4 @@
-package org.example.eventproject.services;
+package main.java.org.example.eventproject.services;
 
 
 import org.example.eventproject.models.UserLogin;
