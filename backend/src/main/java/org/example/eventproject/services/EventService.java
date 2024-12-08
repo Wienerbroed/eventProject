@@ -83,4 +83,22 @@ public class EventService {
     }
 
 
+    public void updateEventSchedule(Long scheduleId, EventSchedule updatedSchedule) {
+        EventSchedule existingSchedule = eventRepository.findScheduleById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("Schedule not found with id " + scheduleId));
+
+        existingSchedule.setScheduleDate(updatedSchedule.getScheduleDate());
+        existingSchedule.setStartTime(updatedSchedule.getStartTime());
+        existingSchedule.setEndTime(updatedSchedule.getEndTime());
+        // Update other fields as necessary
+
+        eventRepository.updateEventSchedule(existingSchedule);
+    }
+
+    public List<EventSchedule> getEventSchedules() {
+        return eventRepository.getEventSchedules();
+    }
+
+
+
 }

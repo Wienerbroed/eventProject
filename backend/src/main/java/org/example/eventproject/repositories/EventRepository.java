@@ -153,4 +153,45 @@ public class EventRepository {
         });
     }
 
+
+    public int updateEventSchedule(EventSchedule schedule) {
+        String sql = "UPDATE EventSchedule SET schedule_date = ?, start_time = ?, end_time = ? WHERE schedule_id = ?";
+        return jdbcTemplate.update(sql, schedule.getScheduleDate(), schedule.getStartTime(), schedule.getEndTime(), schedule.getScheduleId());
+    }
+
+    public Optional<EventSchedule> findScheduleById(Long scheduleId) {
+        String sql = "SELECT * FROM EventSchedule WHERE schedule_id = ?";
+        try {
+            EventSchedule schedule = jdbcTemplate.queryForObject(sql, new Object[]{scheduleId}, new BeanPropertyRowMapper<>(EventSchedule.class));
+            return Optional.ofNullable(schedule);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty(); // Return Optional.empty if no schedule is found
+        }
+    }
+
+
+    public List<EventSchedule> getEventSchedules() {
+        String sql = """
+    SELECT es.schedule_id, es.event_id, es.schedule_date, es.start_time, es.end_time, e.title
+    FROM EventSchedule es
+    JOIN Events e ON es.event_id = e.event_id
+    """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            EventSchedule schedule = new EventSchedule();
+            schedule.setScheduleId(rs.getLong("schedule_id"));
+            schedule.setEventId(rs.getLong("event_id"));
+            schedule.setScheduleDate(rs.getDate("schedule_date").toLocalDate()); // Convert String to LocalDate
+            schedule.setStartTime(rs.getTime("start_time").toLocalTime()); // Convert String to LocalTime
+            schedule.setEndTime(rs.getTime("end_time").toLocalTime()); // Convert String to LocalTime
+            schedule.setTitle(rs.getString("title")); // Map title from the Event table
+            return schedule;
+        });
+    }
+
+
+
+
+
+
 }

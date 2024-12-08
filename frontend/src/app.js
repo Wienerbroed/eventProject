@@ -166,6 +166,17 @@ app.get('/api/events/:eventId/schedule', async (req, res) => {
     }
 });
 
+// Fetch event schedules from the backend API
+app.get('/api/events/schedules', async (req, res) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/events/schedules');
+        const events = await response.json();
+        res.json(events);
+    } catch (error) {
+        res.status(500).send('Error fetching event schedules: ' + error.message);
+    }
+});
+
 app.post('/api/events/addSchedule/:eventId', async (req, res) => {
     try {
         const eventId = req.params.eventId; // Get the eventId from the URL
@@ -207,6 +218,31 @@ app.get('/api/events/venue/:venueId', async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+
+// Update an event schedule
+app.put('/api/events/schedule/:scheduleId', async (req, res) => {
+    const scheduleId = req.params.scheduleId;
+    const updatedSchedule = req.body;
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/schedule/${scheduleId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedSchedule)
+        });
+
+        if (response.ok) {
+            res.status(200).send('Event updated successfully.');
+        } else {
+            const errorText = await response.text();
+            res.status(response.status).send('Error updating event: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error updating event: ' + error.message);
+    }
+});
+
 
 
 //------------------------login and registre---------------------------
@@ -345,6 +381,12 @@ app.delete('/api/venues/:id', async (req, res) => {
 
 
 
+// calender route
+app.get('/eventCalender', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'eventCalender.html'));
+});
+
+// calender -----------------
 
 
 

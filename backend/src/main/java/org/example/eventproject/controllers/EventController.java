@@ -94,4 +94,24 @@ public class EventController {
     }
 
 
+
+    @PutMapping("/schedule/{scheduleId}")
+    public ResponseEntity<String> updateEventSchedule(@PathVariable Long scheduleId, @RequestBody EventSchedule updatedSchedule) {
+        try {
+            eventService.updateEventSchedule(scheduleId, updatedSchedule);
+            return ResponseEntity.ok("Event updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating event: " + e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/schedules")
+    public ResponseEntity<List<EventSchedule>> getEventSchedules() {
+        List<EventSchedule> schedules = eventService.getEventSchedules();
+        return ResponseEntity.ok(schedules);
+    }
+
+
+
 }

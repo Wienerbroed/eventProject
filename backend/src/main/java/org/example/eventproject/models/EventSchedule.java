@@ -26,6 +26,18 @@ public class EventSchedule {
     @Column(name = "end_time")
     private LocalTime endTime;
 
+    @Transient
+    private String title; // Transient field to hold title (not mapped to DB)
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+
     // Getters and setters
     public Long getScheduleId() {
         return scheduleId;
