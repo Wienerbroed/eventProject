@@ -5,6 +5,7 @@ import main.java.org.example.eventproject.services.EventRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +28,8 @@ public class EventRoomController {
         return ResponseEntity.ok(eventRooms);
     }
 
-    // Add a new event room
+    // Sample method to add an event room (restricted to certain roles)
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'UDVIKLER', 'AFVIKLER')")
     @PostMapping("/add")
     public ResponseEntity<EventRoom> addEventRoom(@RequestBody EventRoom eventRoom) {
         EventRoom createdRoom = eventRoomService.addEventRoom(eventRoom);
@@ -42,7 +44,8 @@ public class EventRoomController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Update an event room
+    // Sample method to update an event room (restricted to certain roles)
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'UDVIKLER', 'AFVIKLER')")
     @PutMapping("/{eventRoomId}")
     public ResponseEntity<EventRoom> updateEventRoom(
             @PathVariable Long eventRoomId,
@@ -55,7 +58,8 @@ public class EventRoomController {
         return ResponseEntity.notFound().build();
     }
 
-    // Delete an event room
+    // Sample method to delete an event room (restricted to certain roles)
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'UDVIKLER', 'AFVIKLER')")
     @DeleteMapping("/{eventRoomId}")
     public ResponseEntity<Void> deleteEventRoom(@PathVariable Long eventRoomId) {
         boolean deleted = eventRoomService.deleteEventRoomById(eventRoomId);

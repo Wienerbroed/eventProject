@@ -20,28 +20,28 @@ CREATE TABLE IF NOT EXISTS eventRoom (
 CREATE TABLE IF NOT EXISTS Events (
                                       event_id INT AUTO_INCREMENT PRIMARY KEY,
                                       title VARCHAR(255) NOT NULL,
-    event_creator VARCHAR(255) NOT NULL,
-    event_responsible VARCHAR(255) NOT NULL,
-    event_control VARCHAR(255) NOT NULL,
-    event_type VARCHAR(50) NOT NULL,
-    description TEXT NOT NULL,
-    max_participants INT NOT NULL,
-    max_audience INT NOT NULL,
-    conguide_dk TEXT NOT NULL,
-    conguide_en TEXT NOT NULL,
-    eventRoom_id INT,
-    FOREIGN KEY (eventRoom_id) REFERENCES eventRoom(eventRoom_id, eventRoom_name, venue_id)  ON DELETE SET NULL
-    );
+                                      event_creator VARCHAR(255) NOT NULL,
+                                      event_responsible VARCHAR(255) NOT NULL,
+                                      event_control VARCHAR(255) NOT NULL,
+                                      event_type VARCHAR(50) NOT NULL,
+                                      description TEXT NOT NULL,
+                                      max_participants INT NOT NULL,
+                                      max_audience INT NOT NULL,
+                                      conguide_dk TEXT NOT NULL,
+                                      conguide_en TEXT NOT NULL,
+                                      eventRoom_id INT,
+                                      FOREIGN KEY (eventRoom_id) REFERENCES eventRoom(eventRoom_id) ON DELETE SET NULL
+);
 
 -- Event Expenses Table
 CREATE TABLE IF NOT EXISTS EventExpenses (
                                              expense_id INT AUTO_INCREMENT PRIMARY KEY,
                                              event_id INT NOT NULL,
-                                             time TEXT,
-                                             prize TEXT,
-                                             cost TEXT,
+                                             time DATETIME,
+                                             prize DECIMAL(10, 2),
+                                             cost DECIMAL(10, 2),
                                              FOREIGN KEY (event_id) REFERENCES Events(event_id)
-    );
+);
 
 -- Event Requirements Table
 CREATE TABLE IF NOT EXISTS EventRequirements (
