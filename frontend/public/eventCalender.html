@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drag-and-Drop Calendar</title>
+  <title>Event Calendar with Day View</title>
   <!-- FullCalendar CSS -->
-  <link href="" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.15/main.min.css" rel="stylesheet">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,19 +14,86 @@
       max-width: 900px;
       margin: 40px auto;
     }
+    #event-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: none;
+      width: 300px;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 999;
+    }
+    .view-buttons {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .view-buttons button {
+      margin: 0 5px;
+    }
   </style>
 </head>
 <body>
-<h1 style="text-align: center;">Event Calendar with Drag-and-Drop</h1>
+<h1 style="text-align: center;">Event Calendar with Scheduling</h1>
+
+<div class="view-buttons">
+  <button onclick="changeView('dayGridMonth')">Month View</button>
+  <button onclick="changeView('timeGridWeek')">Week View</button>
+  <button onclick="changeView('timeGridDay')">Day View</button>
+  <button onclick="openAddEventModal()">Add New Event</button>
+</div>
+
 <div id="calendar"></div>
+
+<!-- Event Modal -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div id="event-modal">
+  <h2>Add/Edit Event</h2>
+  <div style="margin-bottom: 10px;">
+    <label>Event Title:</label>
+    <input type="text" id="event-title" placeholder="Event Title" required style="width: 100%; margin-top: 5px;">
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label>Date:</label>
+    <input type="date" id="event-date" required style="width: 100%; margin-top: 5px;">
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label>Start Time:</label>
+    <input type="time" id="event-start-time" required style="width: 100%; margin-top: 5px;">
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label>End Time:</label>
+    <input type="time" id="event-end-time" required style="width: 100%; margin-top: 5px;">
+  </div>
+  <div>
+    <button onclick="saveEvent()">Save Event</button>
+    <button onclick="closeEventModal()">Cancel</button>
+  </div>
+</div>
 
 <!-- FullCalendar JS -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.15/index.global.min.js"></script>
 <script>
+  let calendar;
+  let editingEvent = null;
+
   document.addEventListener('DOMContentLoaded', async function () {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/events/schedules'); // Replace with your API
+        const response = await fetch('http://localhost:3000/api/events/schedules');
         if (!response.ok) throw new Error('Failed to fetch event schedules');
         return await response.json();
       } catch (error) {
@@ -38,20 +105,61 @@
     const events = await fetchEvents();
     const calendarEl = document.getElementById('calendar');
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth', // Free view
-      editable: true,              // Enables drag-and-drop
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      editable: true,
       events: events.map(event => ({
-        scheduleId: event.scheduleId,
+        id: event.scheduleId,
         title: event.title,
-        start: event.scheduleDate,
-        end: event.endDate || null,
+        start: event.scheduleDate && event.startTime
+                ? `${event.scheduleDate}T${event.startTime}`
+                : event.scheduleDate,
+        end: event.endDate && event.endTime
+                ? `${event.endDate}T${event.endTime}`
+                : event.endDate,
+        allDay: !event.startTime // If no start time, treat as all-day event
       })),
+      eventClick: function(info) {
+        // Edit existing event
+        editingEvent = info.event;
+        document.getElementById('event-title').value = info.event.title;
+
+        // Parse start and end dates
+        const startDate = info.event.start;
+        const endDate = info.event.end;
+
+        // Set date inputs
+        if (startDate) {
+          document.getElementById('event-date').value =
+                  startDate.toISOString().split('T')[0];
+
+          // Set time if available
+          if (startDate.getHours() || startDate.getMinutes()) {
+            document.getElementById('event-start-time').value =
+                    startDate.toTimeString().split(' ')[0].slice(0,5);
+          }
+        }
+
+        if (endDate) {
+          document.getElementById('event-end-time').value =
+                  endDate.toTimeString().split(' ')[0].slice(0,5);
+        }
+
+        openAddEventModal();
+      },
       eventDrop: async function (info) {
         const updatedEvent = {
-          scheduleId: info.event.scheduleId,
-          scheduleDate: info.event.start.toISOString(),
-          endDate: info.event.end ? info.event.end.toISOString() : null,
+          scheduleId: info.event.id,
+          title: info.event.title,
+          scheduleDate: info.event.start.toISOString().split('T')[0],
+          startTime: info.event.start.toTimeString().split(' ')[0].slice(0,5),
+          endDate: info.event.end ? info.event.end.toISOString().split('T')[0] : null,
+          endTime: info.event.end ? info.event.end.toTimeString().split(' ')[0].slice(0,5) : null
         };
 
         try {
@@ -71,9 +179,89 @@
       },
     });
 
-
     calendar.render();
   });
+
+  function changeView(viewName) {
+    calendar.changeView(viewName);
+  }
+
+  function openAddEventModal() {
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.getElementById('event-modal').style.display = 'block';
+  }
+
+  function closeEventModal() {
+    document.getElementById('modal-overlay').style.display = 'none';
+    document.getElementById('event-modal').style.display = 'none';
+    editingEvent = null;
+    clearEventForm();
+  }
+
+  function clearEventForm() {
+    document.getElementById('event-title').value = '';
+    document.getElementById('event-date').value = '';
+    document.getElementById('event-start-time').value = '';
+    document.getElementById('event-end-time').value = '';
+  }
+
+  async function saveEvent() {
+    const titleInput = document.getElementById('event-title');
+    const dateInput = document.getElementById('event-date');
+    const startTimeInput = document.getElementById('event-start-time');
+    const endTimeInput = document.getElementById('event-end-time');
+
+    if (!titleInput.value || !dateInput.value || !startTimeInput.value || !endTimeInput.value) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    try {
+      const eventData = {
+        title: titleInput.value,
+        scheduleDate: dateInput.value,
+        startTime: startTimeInput.value,
+        endTime: endTimeInput.value
+      };
+
+      if (editingEvent) {
+        // Update existing event
+        const response = await fetch(`http://localhost:3000/api/events/schedule/${editingEvent.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...eventData,
+            scheduleId: editingEvent.id
+          }),
+        });
+
+        if (!response.ok) throw new Error('Failed to update event');
+
+        editingEvent.remove();
+      } else {
+        // Create new event
+        const response = await fetch('http://localhost:3000/api/events/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventData),
+        });
+
+        if (!response.ok) throw new Error('Failed to create event');
+      }
+
+      // Add event to calendar
+      calendar.addEvent({
+        title: titleInput.value,
+        start: `${dateInput.value}T${startTimeInput.value}`,
+        end: `${dateInput.value}T${endTimeInput.value}`
+      });
+
+      closeEventModal();
+    } catch (error) {
+      console.error('Error saving event:', error);
+      alert('Failed to save event');
+    }
+  }
 </script>
 </body>
 </html>

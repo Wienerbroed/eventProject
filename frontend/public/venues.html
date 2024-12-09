@@ -44,6 +44,7 @@
             color: red;
             font-size: 14px;
         }
+
         /* Style for venue boxes */
         .venue-box {
             padding: 20px;
@@ -100,49 +101,24 @@
     </div>
 </div>
 
-<!-- The Modal for Viewing Venue Details -->
-<div id="viewVenueModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 id="venueName"></h2>
-        <p id="venueAddress"></p>
-    </div>
-</div>
-
 <script>
-    // Wrap everything inside the DOMContentLoaded event to ensure the DOM is loaded
     document.addEventListener('DOMContentLoaded', function () {
-        // Get the modals
         var addVenueModal = document.getElementById("addVenueModal");
-        var viewVenueModal = document.getElementById("viewVenueModal");
 
-        // Get the buttons that open the modals
         var addBtn = document.getElementById("addVenueBtn");
+        var addVenueSpan = addVenueModal.getElementsByClassName("close")[0];
 
-        // Get the <span> elements that close the modals
-        var addSpan = addVenueModal.getElementsByClassName("close")[0];
-        var viewSpan = viewVenueModal.getElementsByClassName("close")[0];
-
-        // When the user clicks the button, open the add venue modal
         addBtn.onclick = function () {
             addVenueModal.style.display = "block";
         }
 
-        // When the user clicks on <span> (x), close the modals
-        addSpan.onclick = function () {
+        addVenueSpan.onclick = function () {
             addVenueModal.style.display = "none";
         }
-        viewSpan.onclick = function () {
-            viewVenueModal.style.display = "none";
-        }
 
-        // When the user clicks anywhere outside of the modals, close them
         window.onclick = function (event) {
             if (event.target == addVenueModal) {
                 addVenueModal.style.display = "none";
-            }
-            if (event.target == viewVenueModal) {
-                viewVenueModal.style.display = "none";
             }
         }
 
@@ -173,9 +149,9 @@
                     <button class="delete-btn" data-id="${venue.venueId}">Delete</button>
                 `;
 
-                // Wrap the venue box in a clickable link
+                // Link each venue to its event rooms page
                 venueElement.addEventListener('click', () => {
-                    window.location.href = `eventsByVenue.html?venueId=${venue.venueId}`;
+                    window.location.href = `eventroomsByVenue.html?venueId=${venue.venueId}`;
                 });
 
                 // Add event listener to the delete button
@@ -190,11 +166,20 @@
             });
         }
 
+        async function deleteVenue(venueId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/venues/${venueId}`, {
+                    method: 'DELETE',
+                });
 
-        function viewVenueDetails(name, address) {
-            document.getElementById('venueName').innerText = name;
-            document.getElementById('venueAddress').innerText = address;
-            viewVenueModal.style.display = "block";
+                if (!response.ok) {
+                    throw new Error('Failed to delete venue');
+                }
+
+                fetchVenues();
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
         // Ensure addVenueForm is correctly initialized after DOM is loaded
@@ -243,29 +228,6 @@
                 }
             });
         }
-
-
-        //Delete Venue
-        async function deleteVenue(venueId) {
-            try {
-                const response = await fetch(`http://localhost:3000/api/venues/${venueId}`, {
-                    method: 'DELETE',
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to delete venue');
-                }
-
-                // Refresh the venue list
-                fetchVenues();
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-
-
-
 
         // Initial fetch of venues
         fetchVenues();

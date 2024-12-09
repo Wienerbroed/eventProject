@@ -9,8 +9,7 @@
 <body>
 <header>
     <h1>All Events</h1>
-    <button class="venue-btn" onclick="window.location.href='venues.html'">Go to Venues</button>
-
+    <button class="venue-btn" onclick="window.location.href='venues.html'">Go to Event Rooms</button>
 </header>
 <div>
     <button class="add-event-btn" onclick="window.location.href='addEvent.html';">Add Event</button>
@@ -49,13 +48,12 @@
             <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
             <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
             <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
-            <p><strong>Venue:</strong> ${event.venue.venueName} (${event.venue.venueAddress})</p>
+            <p><strong>Event Room:</strong> ${event.eventRoom.eventRoomName} (${event.eventRoom.eventRoomAddress})</p>
             <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
         `;
             eventsContainer.appendChild(eventElement);
         });
     }
-
 
     async function deleteEvent(eventId) {
         const confirmation = confirm("Are you sure you want to delete this event?");

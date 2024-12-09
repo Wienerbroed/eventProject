@@ -23,10 +23,10 @@ public class EventController {
     }
 
 
-    // Get All Events
+    // Get All Events with Event Room Details
     @GetMapping()
-    public ResponseEntity<List<Events>> getAllEventsWithVenueDetails() {
-        List<Events> events = eventService.getAllEventsWithVenueDetails();
+    public ResponseEntity<List<Events>> getAllEventsWithEventRoomDetails() {
+        List<Events> events = eventService.getAllEventsWithEventRoomDetails();
         return ResponseEntity.ok(events);
     }
 
@@ -73,9 +73,10 @@ public class EventController {
         return ResponseEntity.ok(updatedEvent);
     }
 
-    @GetMapping("/venue/{venueId}")
-    public ResponseEntity<List<Events>> getEventsByVenue(@PathVariable Long venueId) {
-        List<Events> events = eventService.getEventsByVenueId(venueId);
+    // Get Events by Event Room ID
+    @GetMapping("/eventRoom/{eventRoomId}")
+    public ResponseEntity<List<Events>> getEventsByEventRoom(@PathVariable Long eventRoomId) {
+        List<Events> events = eventService.getEventsByEventRoomId(eventRoomId);
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

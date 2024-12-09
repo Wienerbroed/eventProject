@@ -1,32 +1,31 @@
-<!-- Example: eventsByVenue.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events by Venue</title>
+    <title>Events by Event Room</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header>
-    <h1>Events at Venue</h1>
+    <h1>Events at Event Room</h1>
 </header>
 <div id="eventsContainer"></div>
 
 <script>
     async function fetchEventsByVenue() {
         const urlParams = new URLSearchParams(window.location.search);
-        const venueId = urlParams.get('venueId');
+        const eventRoomId = urlParams.get('venueId');  // This is assumed to still use the 'venueId' in URL, update if necessary
 
-        if (!venueId) {
-            alert('Venue ID is missing');
+        if (!eventRoomId) {
+            alert('Event Room ID is missing');
             return;
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/events/venue/${venueId}`);
+            const response = await fetch(`http://localhost:3000/api/events/venue/${eventRoomId}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch events for this venue');
+                throw new Error('Failed to fetch events for this Event Room');
             }
             const events = await response.json();
             if (Array.isArray(events)) {
@@ -44,7 +43,7 @@
         eventsContainer.innerHTML = '';
 
         if (events.length === 0) {
-            eventsContainer.innerHTML = '<p>No events found for this venue.</p>';
+            eventsContainer.innerHTML = '<p>No events found for this Event Room.</p>';
         }
 
         events.forEach(event => {
@@ -61,6 +60,7 @@
                     <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
                     <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
                     <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
+                    <p><strong>Event Room:</strong> ${event.eventRoom.eventRoomName} (${event.eventRoom.eventRoomAddress})</p>
                 `;
             eventsContainer.appendChild(eventElement);
         });

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Rooms by Venue</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Event Rooms at Venue</h1>
+</header>
+<div id="eventRoomsContainer"></div>
+
+<script>
+  // Function to fetch Event Rooms by Venue
+  async function fetchEventRoomsByVenue() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const venueId = urlParams.get('venueId');
+
+    if (!venueId) {
+      alert('Venue ID is missing');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/eventrooms/venue/${venueId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch event rooms for this venue');
+      }
+      const eventRooms = await response.json();
+      if (Array.isArray(eventRooms)) {
+        displayEventRooms(eventRooms);
+      } else {
+        throw new Error('Unexpected response format');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Function to display Event Rooms
+  function displayEventRooms(eventRooms) {
+    const eventRoomsContainer = document.getElementById('eventRoomsContainer');
+    eventRoomsContainer.innerHTML = '';
+
+    if (eventRooms.length === 0) {
+      eventRoomsContainer.innerHTML = '<p>No event rooms found for this venue.</p>';
+    }
+
+    eventRooms.forEach(eventRoom => {
+      const eventRoomElement = document.createElement('div');
+      eventRoomElement.classList.add('event-room');
+      eventRoomElement.innerHTML = `
+                    <h2>${eventRoom.roomName}</h2>
+                    <p><strong>Capacity:</strong> ${eventRoom.capacity}</p>
+                    <p><strong>Venue:</strong> ${eventRoom.venue.venueName} (${eventRoom.venue.venueAddress})</p>
+                `;
+      eventRoomsContainer.appendChild(eventRoomElement);
+    });
+  }
+
+  // Fetch and display Event Rooms when the page loads
+  window.onload = fetchEventRoomsByVenue;
+</script>
+</body>
+</html>

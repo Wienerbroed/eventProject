@@ -8,6 +8,14 @@ CREATE TABLE IF NOT EXISTS venue (
     venue_address VARCHAR(50) NOT NULL
     );
 
+CREATE TABLE IF NOT EXISTS EventRoom (
+    eventRoom_id int auto_increment primary key,
+    eventRoom_name varchar(50) NOT NULL,
+    eventRoom_capacity int not null,
+    venue_id int,
+    foreign key (venue_id) references venue(venue_id) on delete set null
+);
+
 -- Create Events Table
 CREATE TABLE IF NOT EXISTS Events (
                                       event_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,9 +29,9 @@ CREATE TABLE IF NOT EXISTS Events (
     max_audience INT NOT NULL,
     conguide_dk TEXT NOT NULL,
     conguide_en TEXT NOT NULL,
-    venue_id INT,
-    FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE SET NULL
-    );
+    eventRoom_id INT,  -- Changed to eventRoom_id
+    FOREIGN KEY (eventRoom_id) REFERENCES EventRoom(eventRoom_id) ON DELETE SET NULL  -- Foreign key to EventRoom
+);
 
 -- Event Expenses Table
 CREATE TABLE IF NOT EXISTS EventExpenses (
