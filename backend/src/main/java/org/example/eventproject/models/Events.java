@@ -1,4 +1,4 @@
-package main.java.org.example.eventproject.models;
+package org.example.eventproject.models;
 
 import jakarta.persistence.*;
 
@@ -153,4 +153,6 @@ public class Events {
     public void setEventRoomId(Long eventRoomId) {
         this.eventRoomId = eventRoomId;
     }
+
+
 }

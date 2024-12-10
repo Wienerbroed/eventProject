@@ -1,5 +1,4 @@
-package main.java.org.example.eventproject.models;
-
+package org.example.eventproject.models;
 
 import jakarta.persistence.*;
 
@@ -7,24 +6,19 @@ import jakarta.persistence.*;
 @Table(name = "eventRoom")
 public class EventRoom {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "eventRoomId", nullable = false)
+    @Column(name = "eventRoom_id")
     private Long eventRoomId;
 
-    @Column(name = "eventRoom_name", nullable = false)
+    @Column(name = "eventRoom_name")
     private String eventRoomName;
 
-    @Column(name = "eventRoom_floor", nullable = false)
+    @Column(name = "eventRoom_floor")
     private String eventRoomFloor;
 
-    @Column(name = "venue_id", nullable = false)
-    private Long venueId;  // This is the foreign key field
-
-    // Use @ManyToOne to define the relationship with the Venue entity
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "venue_Id", referencedColumnName = "venue_Id", insertable = false, updatable = false)
+    @ManyToOne
+    @JoinColumn(name = "venue_id")
     private Venue venue;
 
     public Long getEventRoomId() {
@@ -39,7 +33,7 @@ public class EventRoom {
         return eventRoomFloor;
     }
 
-    public void setEventRoomId(Long venueId) {
+    public void setEventRoomId(Long eventRoomId) {
         this.eventRoomId = eventRoomId;
     }
 
@@ -47,11 +41,10 @@ public class EventRoom {
         this.eventRoomName = eventRoomName;
     }
 
-    public void getEventRoomFloor(String eventRoomFloor) {
+    public void setEventRoomFloor(String eventRoomFloor) {
         this.eventRoomFloor = eventRoomFloor;
     }
 
-    // Getter and setter for venue relationship
     public Venue getVenue() {
         return venue;
     }
@@ -59,15 +52,4 @@ public class EventRoom {
     public void setVenue(Venue venue) {
         this.venue = venue;
     }
-
-    public Long getVenueId() {
-        return venueId;
-    }
-
-    public void setVenueId(Long venueId) {
-        this.venueId = venueId;
-    }
-
-
-
 }

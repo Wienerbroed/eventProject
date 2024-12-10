@@ -1,4 +1,4 @@
-package src.main.java.org.example.eventproject.repositories;
+package org.example.eventproject.repositories;
 
 import org.example.eventproject.models.UserLogin;
 import org.springframework.beans.factory.annotation.Autowired;

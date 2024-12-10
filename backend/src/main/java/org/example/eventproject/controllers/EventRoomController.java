@@ -1,7 +1,7 @@
-package main.java.org.example.eventproject.controllers;
+package org.example.eventproject.controllers;
 
-import main.java.org.example.eventproject.models.EventRoom;
-import main.java.org.example.eventproject.services.EventRoomService;
+import org.example.eventproject.models.EventRoom;
+import org.example.eventproject.services.EventRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

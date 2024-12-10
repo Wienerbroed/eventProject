@@ -1,6 +1,10 @@
-package main.java.org.example.eventproject.repositories;
+package org.example.eventproject.repositories;
 
-import main.java.org.example.eventproject.models.*;
+import org.example.eventproject.models.Events;
+import org.example.eventproject.models.EventRoom;
+import org.example.eventproject.models.Venue;
+import org.example.eventproject.models.EventSchedule;
+import org.example.eventproject.models.EventRequirements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -26,7 +30,7 @@ public class EventRepository {
             INSERT INTO Events (title, event_creator, event_responsible, 
                                 event_control, event_type, description, 
                                 max_participants, max_audience, conguide_dk, 
-                                conguide_en, eventRoom_id) 
+                                conguide_en, event_id) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
         return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(),
@@ -45,7 +49,7 @@ public class EventRepository {
                    r.eventRoom_id, r.eventRoom_name, r.eventRoom_floor, 
                    v.venue_id, v.venue_name, v.venue_address
             FROM Events e
-            JOIN eventRoom r ON e.eventRoom_id = r.eventRoom_id
+            JOIN eventRoom r ON r.eventRoom_id = r.eventRoom_id
             JOIN venue v ON r.venue_id = v.venue_id
             WHERE e.event_id = ?
         """;
@@ -97,7 +101,7 @@ public class EventRepository {
                    r.eventRoom_id, r.eventRoom_name, r.eventRoom_floor, 
                    v.venue_id, v.venue_name, v.venue_address
             FROM Events e
-            JOIN eventRoom r ON e.eventRoom_id = r.eventRoom_id
+            JOIN eventRoom r ON r.eventRoom_id = r.eventRoom_id
             JOIN venue v ON r.venue_id = v.venue_id
         """;
 
@@ -160,7 +164,7 @@ public class EventRepository {
             SET title = ?, event_creator = ?, event_responsible = ?, 
                 event_control = ?, event_type = ?, description = ?, 
                 max_participants = ?, max_audience = ?, conguide_dk = ?, 
-                conguide_en = ?, eventRoom_id = ? 
+                conguide_en = ?, event_id = ? 
             WHERE event_id = ?
         """;
         return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(),
@@ -204,4 +208,51 @@ public class EventRepository {
             return schedule;
         });
     }
+
+    public List<Events> getEventsByVenueId(Long venueId) {
+        String sql = """
+            SELECT e.event_id, e.title, e.event_creator, e.event_responsible, 
+                   e.event_control, e.event_type, e.description, 
+                   e.max_participants, e.max_audience, e.conguide_dk, 
+                   e.conguide_en, e.venue_id
+            FROM Events e
+            WHERE e.venue_id = ?
+        """;
+
+        return jdbcTemplate.query(sql, new Object[]{venueId}, (rs, rowNum) -> {
+            Events event = new Events();
+            event.setEventId(rs.getLong("event_id"));
+            event.setTitle(rs.getString("title"));
+            event.setEventCreator(rs.getString("event_creator"));
+            event.setEventResponsible(rs.getString("event_responsible"));
+            event.setEventControl(rs.getString("event_control"));
+            event.setEventType(rs.getString("event_type"));
+            event.setDescription(rs.getString("description"));
+            event.setMaxParticipants(rs.getInt("max_participants"));
+            event.setMaxAudience(rs.getInt("max_audience"));
+            event.setConguideDk(rs.getString("conguide_dk"));
+            event.setConguideEn(rs.getString("conguide_en"));
+            return event;
+        });
+    }
+
+    public int deleteScheduleById(Long scheduleId) {
+        String sql = "DELETE FROM EventSchedule WHERE schedule_id = ?";
+        return jdbcTemplate.update(sql, scheduleId);
+    }
+
+public Optional<EventSchedule> findScheduleById(Long scheduleId) {
+    String sql = "SELECT * FROM EventSchedule WHERE schedule_id = ?";
+    try {
+        EventSchedule eventSchedule = jdbcTemplate.queryForObject(sql, new Object[]{scheduleId}, new BeanPropertyRowMapper<>(EventSchedule.class));
+        return Optional.ofNullable(eventSchedule);
+    } catch (EmptyResultDataAccessException e) {
+        return Optional.empty();
+    }
+}
+
+
+
+
+
 }

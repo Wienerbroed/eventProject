@@ -1,4 +1,4 @@
-package main.java.org.example.eventproject.services;
+package org.example.eventproject.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.eventproject.models.EventSchedule;
@@ -68,11 +68,9 @@ public class EventService {
     }
 
 
-
     public List<Events> getEventsByVenueId(Long venueId) {
         return eventRepository.getEventsByVenueId(venueId);
     }
-
 
     public List<EventSchedule> getEventSchedule(Long eventId) {
         return eventRepository.findScheduleByEventId(eventId);
@@ -83,17 +81,18 @@ public class EventService {
     }
 
 
-    public void updateEventSchedule(Long scheduleId, EventSchedule updatedSchedule) {
-        EventSchedule existingSchedule = eventRepository.findScheduleById(scheduleId)
-                .orElseThrow(() -> new RuntimeException("Schedule not found with id " + scheduleId));
+public void updateEventSchedule(Long scheduleId, EventSchedule updatedSchedule) {
+    Optional<EventSchedule> optionalSchedule = eventRepository.findScheduleById(scheduleId);
+    EventSchedule existingSchedule = optionalSchedule
+            .orElseThrow(() -> new RuntimeException("Schedule not found with id " + scheduleId));
 
-        existingSchedule.setScheduleDate(updatedSchedule.getScheduleDate());
-        existingSchedule.setStartTime(updatedSchedule.getStartTime());
-        existingSchedule.setEndTime(updatedSchedule.getEndTime());
-        // Update other fields as necessary
+    existingSchedule.setScheduleDate(updatedSchedule.getScheduleDate());
+    existingSchedule.setStartTime(updatedSchedule.getStartTime());
+    existingSchedule.setEndTime(updatedSchedule.getEndTime());
+    // Update other fields as necessary
 
-        eventRepository.updateEventSchedule(existingSchedule);
-    }
+    eventRepository.updateEventSchedule(existingSchedule);
+}
 
     public List<EventSchedule> getEventSchedules() {
         return eventRepository.getEventSchedules();

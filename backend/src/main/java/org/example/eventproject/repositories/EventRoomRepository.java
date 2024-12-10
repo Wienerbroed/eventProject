@@ -1,7 +1,7 @@
-package main.java.org.example.eventproject.repositories;
+package org.example.eventproject.repositories;
 
-import main.java.org.example.eventproject.models.EventRoom;
-import main.java.org.example.eventproject.models.Venue;
+import org.example.eventproject.models.EventRoom;
+import org.example.eventproject.models.Venue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -24,7 +24,7 @@ public class EventRoomRepository {
     // Add EventRoom
     public int addEventRoom(EventRoom eventRoom) {
         String sql = "INSERT INTO eventRoom (eventRoom_name, eventRoom_floor, venue_id) VALUES (?, ?, ?)";
-        return jdbcTemplate.update(sql, eventRoom.getEventRoomName(), eventRoom.getEventRoomFloor(), eventRoom.getVenueId());
+        return jdbcTemplate.update(sql, eventRoom.getEventRoomName(), eventRoom.getEventRoomFloor(), eventRoom.getVenue().getVenueId());
     }
 
     // Find EventRoom by ID
@@ -77,6 +77,19 @@ public class EventRoomRepository {
     // Update EventRoom
     public int updateEventRoom(EventRoom eventRoom) {
         String sql = "UPDATE eventRoom SET eventRoom_name = ?, eventRoom_floor = ?, venue_id = ? WHERE eventRoom_id = ?";
-        return jdbcTemplate.update(sql, eventRoom.getEventRoomName(), eventRoom.getEventRoomFloor(), eventRoom.getVenueId(), eventRoom.getEventRoomId());
+        return jdbcTemplate.update(sql, eventRoom.getEventRoomName(), eventRoom.getEventRoomFloor(), eventRoom.getVenue().getVenueId(), eventRoom.getEventRoomId());
     }
+
+    public boolean existsById(Long venueId) {
+        String sql = "SELECT COUNT(*) FROM venue WHERE venue_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{venueId}, Integer.class);
+        return count != null && count > 0;
+    }
+
+    public List<EventRoom> findByVenueId(Long venueId) {
+        String sql = "SELECT * FROM eventRoom WHERE venue_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{venueId}, new BeanPropertyRowMapper<>(EventRoom.class));
+    }
+
+
 }

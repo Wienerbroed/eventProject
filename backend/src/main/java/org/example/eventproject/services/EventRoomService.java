@@ -1,7 +1,7 @@
-package main.java.org.example.eventproject.services;
+package org.example.eventproject.services;
 
-import main.java.org.example.eventproject.models.EventRoom;
-import main.java.org.example.eventproject.repositories.EventRoomRepository;
+import org.example.eventproject.models.EventRoom;
+import org.example.eventproject.repositories.EventRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class EventRoomService {
 
     // Get all EventRooms
     public List<EventRoom> getAllEventRooms() {
-        return eventRoomRepository.findAll();
+        return eventRoomRepository.findAllEventRooms();
     }
 
     // Update EventRoom details
