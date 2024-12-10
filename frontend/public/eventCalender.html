@@ -116,67 +116,47 @@
       events: events.map(event => ({
         id: event.scheduleId,
         title: event.title,
-        start: event.scheduleDate && event.startTime
-                ? `${event.scheduleDate}T${event.startTime}`
-                : event.scheduleDate,
-        end: event.endDate && event.endTime
-                ? `${event.endDate}T${event.endTime}`
-                : event.endDate,
-        allDay: !event.startTime // If no start time, treat as all-day event
+        start: `${event.scheduleDate}T${event.startTime}`, // Start time
+        end: `${event.scheduleDate}T${event.endTime}`,   // End time
+        allDay: false
       })),
       eventClick: function(info) {
         // Edit existing event
         editingEvent = info.event;
         document.getElementById('event-title').value = info.event.title;
-
-        // Parse start and end dates
         const startDate = info.event.start;
         const endDate = info.event.end;
-
-        // Set date inputs
         if (startDate) {
-          document.getElementById('event-date').value =
-                  startDate.toISOString().split('T')[0];
-
-          // Set time if available
-          if (startDate.getHours() || startDate.getMinutes()) {
-            document.getElementById('event-start-time').value =
-                    startDate.toTimeString().split(' ')[0].slice(0,5);
-          }
+          document.getElementById('event-date').value = startDate.toISOString().split('T')[0];
+          document.getElementById('event-start-time').value = startDate.toTimeString().slice(0,5);
         }
-
         if (endDate) {
-          document.getElementById('event-end-time').value =
-                  endDate.toTimeString().split(' ')[0].slice(0,5);
+          document.getElementById('event-end-time').value = endDate.toTimeString().slice(0,5);
         }
-
         openAddEventModal();
       },
       eventDrop: async function (info) {
-        const updatedEvent = {
-          scheduleId: info.event.id,
-          title: info.event.title,
-          scheduleDate: info.event.start.toISOString().split('T')[0],
-          startTime: info.event.start.toTimeString().split(' ')[0].slice(0,5),
-          endDate: info.event.end ? info.event.end.toISOString().split('T')[0] : null,
-          endTime: info.event.end ? info.event.end.toTimeString().split(' ')[0].slice(0,5) : null
-        };
-
         try {
+          const updatedEvent = {
+            scheduleId: info.event.id,
+            title: info.event.title,
+            scheduleDate: info.event.start.toISOString().split('T')[0],
+            startTime: info.event.start.toTimeString().slice(0,5),
+            endTime: info.event.end ? info.event.end.toTimeString().slice(0,5) : null
+          };
           const response = await fetch(`http://localhost:3000/api/events/schedule/${info.event.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedEvent),
           });
-
           if (!response.ok) throw new Error('Failed to update event');
           alert('Event updated successfully!');
         } catch (error) {
           console.error('Error updating event:', error);
           alert('Failed to update event. Reverting changes.');
-          info.revert(); // Revert to original position
+          info.revert();
         }
-      },
+      }
     });
 
     calendar.render();
@@ -225,31 +205,22 @@
       };
 
       if (editingEvent) {
-        // Update existing event
         const response = await fetch(`http://localhost:3000/api/events/schedule/${editingEvent.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...eventData,
-            scheduleId: editingEvent.id
-          }),
+          body: JSON.stringify({ ...eventData, scheduleId: editingEvent.id }),
         });
-
         if (!response.ok) throw new Error('Failed to update event');
-
         editingEvent.remove();
       } else {
-        // Create new event
         const response = await fetch('http://localhost:3000/api/events/schedule', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(eventData),
         });
-
         if (!response.ok) throw new Error('Failed to create event');
       }
 
-      // Add event to calendar
       calendar.addEvent({
         title: titleInput.value,
         start: `${dateInput.value}T${startTimeInput.value}`,
