@@ -207,7 +207,7 @@ async function deleteExpense(expenseId) {
     if (!confirmation) return;
 
     try {
-        const response = await fetch(`http://localhost:3000/api/events/expenses/${expenseId}`, {
+        const response = await fetch(`http://localhost:3000/api/events/expense/${expenseId}`, {
             method: 'DELETE'
         });
 
@@ -261,7 +261,7 @@ document.getElementById('expenseForm').addEventListener('submit', function (even
         cost: document.getElementById('expenseCost').value,
     };
 
-    fetch(`http://localhost:3000/api/events/${eventId}/addExpense`, {
+    fetch(`http://localhost:3000/api/events/addExpense/${eventId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(expenseData),
