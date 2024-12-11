@@ -5,8 +5,10 @@ const eventId = urlParams.get('id'); // Use the event ID from the URL parameters
 // Get modal elements
 const scheduleModal = document.getElementById('scheduleModal');
 const expenseModal = document.getElementById('expenseModal');
+const requirementModal = document.getElementById('requirementModal'); // Add this line
 const addScheduleBtn = document.getElementById('addScheduleBtn');
 const addExpenseBtn = document.getElementById('addExpenseBtn');
+const addRequirementBtn = document.getElementById('addRequirementBtn'); // Add this line
 const closeBtns = document.querySelectorAll('.close');
 
 // Open modal on button click
@@ -18,11 +20,17 @@ addExpenseBtn.onclick = function () {
     expenseModal.style.display = 'block';
 };
 
+addRequirementBtn.onclick = function () { // Add this function
+    requirementModal.style.display = 'block';
+};
+
+
 // Close modal on close button click
 closeBtns.forEach(btn => {
     btn.onclick = function () {
         scheduleModal.style.display = 'none';
         expenseModal.style.display = 'none';
+        requirementModal.style.display = 'none'; // Add this line
     };
 });
 
@@ -33,6 +41,9 @@ window.onclick = function (event) {
     }
     if (event.target === expenseModal) {
         expenseModal.style.display = 'none';
+    }
+    if (event.target === requirementModal) { // Add this condition
+        requirementModal.style.display = 'none';
     }
 };
 
@@ -107,7 +118,7 @@ async function updateEvent(event) {
     try {
         const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(updatedEvent)
         });
 
@@ -124,8 +135,6 @@ async function updateEvent(event) {
 }
 
 document.getElementById('updateEventForm').addEventListener('submit', updateEvent);
-
-
 
 
 async function fetchEventSchedule(eventId) {
@@ -238,7 +247,7 @@ document.getElementById('scheduleForm').addEventListener('submit', function (eve
 
     fetch(`http://localhost:3000/api/events/addSchedule/${eventId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(scheduleData),
     })
         .then(response => {
@@ -263,7 +272,7 @@ document.getElementById('expenseForm').addEventListener('submit', function (even
 
     fetch(`http://localhost:3000/api/events/addExpense/${eventId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(expenseData),
     })
         .then(response => {
@@ -277,3 +286,88 @@ document.getElementById('expenseForm').addEventListener('submit', function (even
         })
         .catch(error => console.error('Error:', error));
 });
+
+
+// Add Requirement
+document.getElementById('requirementForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const requirementData = {
+        praktiskeKrav: document.getElementById('praktiskeKrav').value,
+        tekniskeKrav: document.getElementById('tekniskeKrav').value,
+        materialebehov: document.getElementById('materialebehov').value,
+        gopherbehov: document.getElementById('gopherbehov').value,
+    };
+
+    fetch(`http://localhost:3000/api/events/addRequirement/${eventId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(requirementData),
+    })
+        .then(response => {
+            if (response.ok) {
+                alert('Requirement added successfully!');
+                requirementModal.style.display = 'none';
+                fetchEventRequirements(eventId); // Refresh the requirements list
+            } else {
+                alert('Failed to add requirement.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+});
+
+// Fetch and display event requirements
+async function fetchEventRequirements(eventId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/events/${eventId}/requirements`);
+        const requirements = await response.json();
+        displayEventRequirements(requirements);
+    } catch (error) {
+        console.error('Error fetching event requirements:', error);
+    }
+}
+
+function displayEventRequirements(requirements) {
+    const requirementsList = document.getElementById('requirementsList');
+    requirementsList.innerHTML = ''; // Clear existing requirements
+
+    requirements.forEach(item => {
+        const requirementItem = document.createElement('div');
+        requirementItem.className = 'requirement-item';
+        requirementItem.innerHTML = `
+            <p><strong>Praktiske Krav:</strong> ${item.praktiskeKrav}</p>
+            <p><strong>Tekniske Krav:</strong> ${item.tekniskeKrav}</p>
+            <p><strong>Materialebehov:</strong> ${item.materialebehov}</p>
+            <p><strong>Gopherbehov:</strong> ${item.gopherbehov}</p>
+            <button class="delete-btn" onclick="deleteRequirement(${item.requirementId})">Delete</button>
+        `;
+        requirementsList.appendChild(requirementItem);
+    });
+}
+
+async function deleteRequirement(requirementId) {
+    const confirmation = confirm("Are you sure you want to delete this requirement?");
+    if (!confirmation) return;
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/events/requirement/${eventId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('Requirement deleted successfully!');
+            fetchEventRequirements(eventId); // Refresh the requirements list after deletion
+        } else {
+            alert('Failed to delete requirement.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+
+// Initialize data on page load
+if (eventId) {
+    fetchEventDetails(eventId);
+    fetchEventSchedule(eventId)
+    fetchEventRequirements(eventId); // Fetch and display event requirements
+}

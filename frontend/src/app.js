@@ -407,7 +407,21 @@ app.get('/api/events/:eventId/requirements', async (req, res) => {
 });
 
 
+// Delete a requirement
+app.delete('/api/events/requirement/:eventId', async (req, res) => {
+    try {
+        const eventId = req.params.eventId;
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/requirement/${eventId}`, { method: 'DELETE' });
 
+        if (deleteResponse.ok) {
+            res.status(204).send('Requirement deleted successfully.');
+        } else {
+            res.status(deleteResponse.status).send('Failed to delete requirement: ' + deleteResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error deleting requirement: ' + error.message);
+    }
+});
 
 
 

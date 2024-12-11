@@ -179,9 +179,9 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding requirement: " + e.getMessage());
         }
     }
-    @DeleteMapping("/requirement/{requirementId}")
-    public ResponseEntity<Void> deleteEventRequirement(@PathVariable Long requirementId) {
-        eventService.deleteRequirementById(requirementId);
+    @DeleteMapping("/requirement/{eventId}")
+    public ResponseEntity<Void> deleteEventRequirement(@PathVariable Long eventId) {
+        eventService.deleteRequirementByEventId(eventId);
         return ResponseEntity.noContent().build();
     }
 

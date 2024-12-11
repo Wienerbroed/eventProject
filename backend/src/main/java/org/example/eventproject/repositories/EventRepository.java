@@ -201,10 +201,10 @@ public class EventRepository {
         return jdbcTemplate.query(sql, new Object[]{eventId}, new BeanPropertyRowMapper<>(EventRequirements.class));
     }
 
-    // Delete requirement by ID
-    public int deleteRequirementById(Long requirementId) {
-        String sql = "DELETE FROM EventRequirements WHERE requirement_id = ?";
-        return jdbcTemplate.update(sql, requirementId);
+    // Delete requirement by event ID
+    public int deleteRequirementByEventId(Long eventId) {
+        String sql = "DELETE FROM EventRequirements WHERE event_id = ?";
+        return jdbcTemplate.update(sql, eventId);
     }
 
     // Delete expense by ID

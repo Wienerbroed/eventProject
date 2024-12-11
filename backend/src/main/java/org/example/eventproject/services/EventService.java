@@ -133,8 +133,8 @@ public class EventService {
     }
 
 
-    public int deleteRequirementById(Long requirementId) {
-        return eventRepository.deleteRequirementById(requirementId);
+    public void deleteRequirementByEventId(Long eventId) {
+        eventRepository.deleteRequirementByEventId(eventId);
     }
 
 

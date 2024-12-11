@@ -6,12 +6,15 @@ import jakarta.persistence.*;
 @Table(name = "EventRequirements")
 public class EventRequirements {
     @Id
-    @Column(name = "event_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "requirement_id")
+    private Long requirementId;
+
+    @Column(name = "event_id", nullable = false)
     private Long eventId;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "event_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", insertable = false, updatable = false)
     private Events event;
 
     @Column(name = "praktiske_krav")
@@ -27,6 +30,14 @@ public class EventRequirements {
     private String gopherbehov;
 
     // Getters and setters
+    public Long getRequirementId() {
+        return requirementId;
+    }
+
+    public void setRequirementId(Long requirementId) {
+        this.requirementId = requirementId;
+    }
+
     public Long getEventId() {
         return eventId;
     }

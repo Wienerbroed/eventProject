@@ -80,6 +80,44 @@
     <h2>Expenses</h2>
 </div>
 
+<!-- Event Requirements Display -->
+<div id="requirementsList" style="margin: 1rem auto; padding: 1rem; max-width: 800px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+    <h2>Event Requirements</h2>
+</div>
+
+<!-- Add Requirements Button -->
+<div class="button-container">
+    <button id="addRequirementBtn">Add Requirement</button>
+</div>
+
+<!-- Modal for Requirements -->
+<div id="requirementModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Requirement</h2>
+        <form id="requirementForm">
+            <div>
+                <label for="praktiskeKrav">Praktiske Krav:</label>
+                <textarea id="praktiskeKrav" name="praktiskeKrav" required></textarea>
+            </div>
+            <div>
+                <label for="tekniskeKrav">Tekniske Krav:</label>
+                <textarea id="tekniskeKrav" name="tekniskeKrav" required></textarea>
+            </div>
+            <div>
+                <label for="materialebehov">Materialebehov:</label>
+                <textarea id="materialebehov" name="materialebehov" required></textarea>
+            </div>
+            <div>
+                <label for="gopherbehov">Gopherbehov:</label>
+                <textarea id="gopherbehov" name="gopherbehov" required></textarea>
+            </div>
+            <button type="submit">Add Requirement</button>
+        </form>
+    </div>
+</div>
+
+
 <form id="updateEventForm">
     <input type="hidden" id="eventId" name="eventId">
     <input type="hidden" id="venueId" name="venueId"> <!-- Hidden Venue ID -->
