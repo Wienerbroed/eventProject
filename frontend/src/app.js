@@ -3,6 +3,8 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cookieParser from 'cookie-parser';
+import jwt from 'jsonwebtoken';
 
 // Helper to get __dirname since it's not available in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -10,6 +12,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SECRET_KEY = 'BabskiOgJagger'; // Replace with your actual secret key
+const expiresIn = '1h'; // Token expiration time
 
 // Start the server
 app.listen(PORT, () => {
@@ -20,25 +24,45 @@ app.listen(PORT, () => {
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public'))); // Serve static files from the 'public' folder
+app.use(cookieParser());
+
+
+// Middleware to check authentication
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.token || req.headers['authorization'];
+
+    if (!token) {
+        res.redirect('/loginAndRegisterPage');
+        return res.status(401).send('Access Denied');
+    }
+
+    try {
+        const verified = jwt.verify(token, SECRET_KEY);
+        req.user = verified;
+        next();
+    } catch (err) {
+        res.status(400).send('Invalid Token');
+    }
+};
+
 
 // ---------- Event Routes ----------
 
 
 // Serve `event.html` at the `/events` route
-app.get('/events', (req, res) => {
+app.get('/events', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
 
 // Serve `addEvent.html` at the `/events/add` route
-app.get('/events/add', (req, res) => {
+app.get('/events/add', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'addEvent.html'));
 });
 
 // Serve `seeEvent.html` at the `/events/:id` route
-app.get('/events/:id', (req, res) => {
+app.get('/events/:id', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'seeEvent.html'));
 });
-
 
 
 //------------------------EVENT---------------------------
@@ -311,7 +335,7 @@ app.get('/api/events/:eventId/requirements', async (req, res) => {
 
 
 // Serve `loginAndRegisterPage.html` at `/loginAndRegisterPage` route
-app.get('/loginAndRegisterPage', (req, res) => {
+app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'loginAndRegisterPage.html'));
 });
 
@@ -350,6 +374,8 @@ app.post('/api/login', async (req, res) => {
         });
 
         if (response.ok) {
+            const token = jwt.sign({ username: loginData.username }, SECRET_KEY, { expiresIn: '1h' });
+            res.cookie('token', token, { httpOnly: true });
             res.status(200).send('Login successful.');
         } else {
             const errorText = await response.text();
@@ -360,19 +386,23 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-
+//Handle USer logout
+app.get('/api/logout', (req, res) => {
+    res.clearCookie('token');
+    res.status(200).send('User logged out successfully.');
+});
 
 
 
 // ---------- Venue Routes ----------
 
 // Serve `venues.html` at the `/venues` route
-app.get('/venues', (req, res) => {
+app.get('/venues', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
 });
 
 
-app.get('/venues/:id', (req, res) => {
+app.get('/venues/:id', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
 });
 
