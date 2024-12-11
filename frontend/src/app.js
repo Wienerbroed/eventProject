@@ -343,10 +343,10 @@ app.get('/api/events/:eventId/expenses', async (req, res) => {
 });
 
 // Delete an expense
-app.delete('/api/events/expenses/:expenseId', async (req, res) => {
+app.delete('/api/events/expense/:expenseId', async (req, res) => {
     try {
         const expenseId = req.params.expenseId;
-        const deleteResponse = await fetch(`http://localhost:8080/api/events/expenses/${expenseId}`, { method: 'DELETE' });
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/expense/${expenseId}`, { method: 'DELETE' });
 
         if (deleteResponse.ok) {
             res.status(204).send('Expense deleted successfully.');
