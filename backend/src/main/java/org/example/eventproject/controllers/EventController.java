@@ -31,6 +31,14 @@ public class EventController {
     @GetMapping()
     public ResponseEntity<List<Events>> getAllEventsWithVenueDetails() {
         List<Events> events = eventService.getAllEventsWithVenueDetails();
+        System.out.println("Fetched events: " + events);  // Log the events
+        return ResponseEntity.ok(events);
+    }
+    // Get All Events
+    @GetMapping("all")
+    public ResponseEntity<List<Events>> getAllEvents() {
+        List<Events> events = eventService.getAllEvents();
+        System.out.println("Fetched events: " + events);  // Log the events
         return ResponseEntity.ok(events);
     }
 
@@ -69,10 +77,20 @@ public class EventController {
         eventService.deleteEvent(eventId);
         return ResponseEntity.noContent().build();
     }
-    // Update Event
     @PostMapping("/{eventId}")
     public ResponseEntity<Events> updateEventPost(@PathVariable Long eventId, @RequestBody Events event) {
+        // Ensure the event has the correct ID
         event.setEventId(eventId);
+
+        // Fetch the existing event to ensure venue details are not lost
+        Optional<Events> existingEventOpt = eventService.getEventById(eventId);
+        if (existingEventOpt.isPresent()) {
+            Events existingEvent = existingEventOpt.get();
+            if (event.getVenue() == null) {
+                event.setVenue(existingEvent.getVenue());
+            }
+        }
+
         Events updatedEvent = eventService.updateEvent(event);
         return ResponseEntity.ok(updatedEvent);
     }
@@ -80,9 +98,20 @@ public class EventController {
     @PutMapping("/{eventId}")
     public ResponseEntity<Events> updateEventPut(@PathVariable Long eventId, @RequestBody Events event) {
         event.setEventId(eventId);
+
+        // Fetch the existing event to ensure venue details are not lost
+        Optional<Events> existingEventOpt = eventService.getEventById(eventId);
+        if (existingEventOpt.isPresent()) {
+            Events existingEvent = existingEventOpt.get();
+            if (event.getVenue() == null) {
+                event.setVenue(existingEvent.getVenue());
+            }
+        }
+
         Events updatedEvent = eventService.updateEvent(event);
         return ResponseEntity.ok(updatedEvent);
     }
+
 
     @GetMapping("/venue/{venueId}")
     public ResponseEntity<List<Events>> getEventsByVenue(@PathVariable Long venueId) {

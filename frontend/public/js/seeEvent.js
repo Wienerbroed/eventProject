@@ -1,4 +1,6 @@
-// JavaScript code for handling modals, form submissions, and fetching data
+// Get URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const eventId = urlParams.get('id'); // Use the event ID from the URL parameters
 
 // Get modal elements
 const scheduleModal = document.getElementById('scheduleModal');
@@ -34,67 +36,19 @@ window.onclick = function (event) {
     }
 };
 
-// Handle schedule form submission
-document.getElementById('scheduleForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    const eventId = urlParams.get('id'); // Use the event ID from the URL parameters
-    const scheduleData = {
-        scheduleDate: document.getElementById('scheduleDate').value,
-        startTime: document.getElementById('startTime').value,
-        endTime: document.getElementById('endTime').value,
-    };
-
-    fetch(`http://localhost:3000/api/events/addSchedule/${eventId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(scheduleData),
-    })
-        .then((response) => {
-            if (response.ok) {
-                alert('Schedule added successfully!');
-                scheduleModal.style.display = 'none';
-                fetchEventSchedule(eventId);
-            } else {
-                alert('Failed to add schedule.');
-            }
-        })
-        .catch((error) => console.error('Error:', error));
-});
-
-// Handle expense form submission
-document.getElementById('expenseForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    const eventId = urlParams.get('id'); // Use the event ID from the URL parameters
-    const expenseData = {
-        time: document.getElementById('expenseTime').value,
-        prize: document.getElementById('expensePrize').value,
-        cost: document.getElementById('expenseCost').value,
-    };
-
-    fetch(`http://localhost:3000/api/events/${eventId}/addExpense`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(expenseData),
-    })
-        .then((response) => {
-            if (response.ok) {
-                alert('Expense added successfully!');
-                expenseModal.style.display = 'none';
-                fetchEventExpenses(eventId);
-            } else {
-                alert('Failed to add expense.');
-            }
-        })
-        .catch((error) => console.error('Error:', error));
-});
-
-function fetchEventDetails(eventId) {
-    fetch(`http://localhost:3000/api/events/${eventId}`)
-        .then((response) => response.json())
-        .then((event) => displayEventDetails(event))
-        .catch((error) => console.error('Error:', error));
+// Fetch event details, schedule, and expenses
+async function fetchEventDetails(eventId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/events/${eventId}`);
+        const event = await response.json();
+        if (event) {
+            displayEventDetails(event);
+            fetchEventSchedule(eventId);
+            fetchEventExpenses(eventId);
+        }
+    } catch (error) {
+        console.error('Error fetching event details:', error);
+    }
 }
 
 function displayEventDetails(event) {
@@ -109,22 +63,45 @@ function displayEventDetails(event) {
     document.getElementById('maxAudience').value = event.maxAudience;
     document.getElementById('conguideDk').value = event.conguideDk;
     document.getElementById('conguideEn').value = event.conguideEn;
+    document.getElementById('venueId').value = event.venueId; // Set the venueId
 }
+
 
 async function updateEvent(event) {
     event.preventDefault();
     const eventId = document.getElementById('eventId').value;
+
+    const titleElement = document.getElementById('title');
+    const eventCreatorElement = document.getElementById('eventCreator');
+    const eventResponsibleElement = document.getElementById('eventResponsible');
+    const eventControlElement = document.getElementById('eventControl');
+    const eventTypeElement = document.getElementById('eventType');
+    const descriptionElement = document.getElementById('description');
+    const maxParticipantsElement = document.getElementById('maxParticipants');
+    const maxAudienceElement = document.getElementById('maxAudience');
+    const conguideDkElement = document.getElementById('conguideDk');
+    const conguideEnElement = document.getElementById('conguideEn');
+    const venueIdElement = document.getElementById('venueId');
+
+    if (!titleElement || !eventCreatorElement || !eventResponsibleElement || !eventControlElement || !eventTypeElement || !descriptionElement || !maxParticipantsElement || !maxAudienceElement || !conguideDkElement || !conguideEnElement || !venueIdElement) {
+        console.error('One or more elements are missing in the DOM');
+        return;
+    }
+
     const updatedEvent = {
-        title: document.getElementById('title').value,
-        eventCreator: document.getElementById('eventCreator').value,
-        eventResponsible: document.getElementById('eventResponsible').value,
-        eventControl: document.getElementById('eventControl').value,
-        eventType: document.getElementById('eventType').value,
-        description: document.getElementById('description').value,
-        maxParticipants: document.getElementById('maxParticipants').value,
-        maxAudience: document.getElementById('maxAudience').value,
-        conguideDk: document.getElementById('conguideDk').value,
-        conguideEn: document.getElementById('conguideEn').value
+        title: titleElement.value,
+        eventCreator: eventCreatorElement.value,
+        eventResponsible: eventResponsibleElement.value,
+        eventControl: eventControlElement.value,
+        eventType: eventTypeElement.value,
+        description: descriptionElement.value,
+        maxParticipants: maxParticipantsElement.value,
+        maxAudience: maxAudienceElement.value,
+        conguideDk: conguideDkElement.value,
+        conguideEn: conguideEnElement.value,
+        venue: {
+            venueId: venueIdElement.value,
+        }
     };
 
     try {
@@ -146,14 +123,19 @@ async function updateEvent(event) {
     }
 }
 
-// Add event listener for the update event form submission
 document.getElementById('updateEventForm').addEventListener('submit', updateEvent);
 
-function fetchEventSchedule(eventId) {
-    fetch(`http://localhost:3000/api/events/${eventId}/schedule`)
-        .then((response) => response.json())
-        .then((schedule) => displayEventSchedule(schedule))
-        .catch((error) => console.error('Error:', error));
+
+
+
+async function fetchEventSchedule(eventId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/events/${eventId}/schedule`);
+        const schedule = await response.json();
+        displayEventSchedule(schedule);
+    } catch (error) {
+        console.error('Error fetching event schedule:', error);
+    }
 }
 
 function displayEventSchedule(schedule) {
@@ -184,7 +166,7 @@ async function deleteSchedule(scheduleId) {
 
         if (response.ok) {
             alert('Schedule deleted successfully!');
-            fetchEventSchedule(eventId); // Refresh the event list after deletion
+            fetchEventSchedule(eventId); // Refresh the event schedule after deletion
         } else {
             alert('Failed to delete schedule.');
         }
@@ -193,11 +175,14 @@ async function deleteSchedule(scheduleId) {
     }
 }
 
-function fetchEventExpenses(eventId) {
-    fetch(`http://localhost:3000/api/events/${eventId}/expenses`)
-        .then((response) => response.json())
-        .then((expenses) => displayEventExpenses(expenses))
-        .catch((error) => console.error('Error:', error));
+async function fetchEventExpenses(eventId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/events/${eventId}/expenses`);
+        const expenses = await response.json();
+        displayEventExpenses(expenses);
+    } catch (error) {
+        console.error('Error fetching event expenses:', error);
+    }
 }
 
 function displayEventExpenses(expenses) {
@@ -228,7 +213,7 @@ async function deleteExpense(expenseId) {
 
         if (response.ok) {
             alert('Expense deleted successfully!');
-            fetchEventExpenses(eventId); // Refresh the expense list after deletion
+            fetchEventExpenses(eventId); // Refresh the event expenses after deletion
         } else {
             alert('Failed to delete expense.');
         }
@@ -237,11 +222,58 @@ async function deleteExpense(expenseId) {
     }
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const eventId = urlParams.get('id');
-
+// Initialize data on page load
 if (eventId) {
     fetchEventDetails(eventId);
-    fetchEventSchedule(eventId);
-    fetchEventExpenses(eventId);
 }
+
+// Event form handling (schedules and expenses)
+document.getElementById('scheduleForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const scheduleData = {
+        scheduleDate: document.getElementById('scheduleDate').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+    };
+
+    fetch(`http://localhost:3000/api/events/addSchedule/${eventId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(scheduleData),
+    })
+        .then(response => {
+            if (response.ok) {
+                alert('Schedule added successfully!');
+                scheduleModal.style.display = 'none';
+                fetchEventSchedule(eventId); // Refresh the schedule list
+            } else {
+                alert('Failed to add schedule.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+});
+
+document.getElementById('expenseForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const expenseData = {
+        time: document.getElementById('expenseTime').value,
+        prize: document.getElementById('expensePrize').value,
+        cost: document.getElementById('expenseCost').value,
+    };
+
+    fetch(`http://localhost:3000/api/events/${eventId}/addExpense`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(expenseData),
+    })
+        .then(response => {
+            if (response.ok) {
+                alert('Expense added successfully!');
+                expenseModal.style.display = 'none';
+                fetchEventExpenses(eventId); // Refresh the expense list
+            } else {
+                alert('Failed to add expense.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+});

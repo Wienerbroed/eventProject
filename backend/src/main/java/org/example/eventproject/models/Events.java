@@ -153,4 +153,25 @@ public class Events {
     public void setVenueId(Long venueId) {
         this.venueId = venueId;
     }
+
+
+
+    @Override
+    public String toString() {
+        return "Events{" +
+                "eventId=" + eventId +
+                ", title='" + title + '\'' +
+                ", eventCreator='" + eventCreator + '\'' +
+                ", eventResponsible='" + eventResponsible + '\'' +
+                ", eventControl='" + eventControl + '\'' +
+                ", eventType='" + eventType + '\'' +
+                ", description='" + description + '\'' +
+                ", maxParticipants=" + maxParticipants +
+                ", maxAudience=" + maxAudience +
+                ", conguideDk='" + conguideDk + '\'' +
+                ", conguideEn='" + conguideEn + '\'' +
+                ", venue=" + venue +
+                '}';
+    }
+
 }

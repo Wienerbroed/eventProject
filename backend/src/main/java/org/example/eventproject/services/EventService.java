@@ -60,11 +60,25 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
-    // Update Event
     public Events updateEvent(Events event) {
         if (!eventRepository.existsById(event.getEventId())) {
             throw new EntityNotFoundException("Event not found with ID: " + event.getEventId());
         }
+
+        // Fetch the existing event to get the current venue information
+        Optional<Events> existingEventOpt = eventRepository.findById(event.getEventId());
+        if (existingEventOpt.isPresent()) {
+            Events existingEvent = existingEventOpt.get();
+            if (event.getVenue() == null) {
+                event.setVenue(existingEvent.getVenue());
+            }
+        }
+
+        // Ensure the venue is not null before updating
+        if (event.getVenue() == null) {
+            throw new IllegalArgumentException("Venue cannot be null");
+        }
+
         eventRepository.updateEvent(event);
         return event;
     }

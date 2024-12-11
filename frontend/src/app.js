@@ -85,6 +85,20 @@ app.get('/api/events', async (req, res) => {
         res.status(500).send('Error fetching events: ' + error.message);
     }
 });
+
+// Fetch events from the backend API
+app.get('/api/events', async (req, res) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/events');
+        const events = await response.json();
+        res.json(events);
+    } catch (error) {
+        res.status(500).send('Error fetching events: ' + error.message);
+    }
+});
+
+
+
 // Fetch a specific event by ID
 app.get('/api/events/:id', async (req, res) => {
     const eventId = req.params.id;
