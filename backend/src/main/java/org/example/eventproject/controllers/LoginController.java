@@ -1,11 +1,9 @@
 package org.example.eventproject.controllers;
 
-import org.example.eventproject.models.Events;
 import org.example.eventproject.models.UserLogin;
 import org.example.eventproject.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 

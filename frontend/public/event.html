@@ -10,6 +10,7 @@
 <header>
     <h1>All Events</h1>
     <button class="venue-btn" onclick="window.location.href='venues.html'">Go to Venues</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
 
 </header>
 <div>
@@ -77,6 +78,22 @@
             alert('An error occurred.');
         }
     }
+
+    async function logout() {
+        try {
+            const response = await fetch('http://localhost:3000/api/logout');
+            if (response.ok) {
+                window.location.href = 'loginAndRegisterPage.html';
+            } else {
+                alert('Failed to log out.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        }
+    }
+
+
 
     // Fetch and display events when the page loads
     window.onload = fetchEvents;
