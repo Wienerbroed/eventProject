@@ -189,8 +189,29 @@ public class EventRepository {
         });
     }
 
+    // Get expenses by event ID
+    public List<EventExpenses> findExpensesByEventId(Long eventId) {
+        String sql = "SELECT * FROM EventExpenses WHERE event_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{eventId}, new BeanPropertyRowMapper<>(EventExpenses.class));
+    }
 
+    // Get requirements by event ID
+    public List<EventRequirements> findRequirementsByEventId(Long eventId) {
+        String sql = "SELECT * FROM EventRequirements WHERE event_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{eventId}, new BeanPropertyRowMapper<>(EventRequirements.class));
+    }
 
+    // Delete requirement by ID
+    public int deleteRequirementById(Long requirementId) {
+        String sql = "DELETE FROM EventRequirements WHERE requirement_id = ?";
+        return jdbcTemplate.update(sql, requirementId);
+    }
+
+    // Delete expense by ID
+    public int deleteExpenseById(Long expenseId) {
+        String sql = "DELETE FROM EventExpenses WHERE expense_id = ?";
+        return jdbcTemplate.update(sql, expenseId);
+    }
 
 
 

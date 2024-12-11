@@ -24,6 +24,12 @@ public class EventExpenses {
     private String cost;
 
     // Getters and setters
+
+
+
+
+
+
     public Long getExpenseId() {
         return expenseId;
     }

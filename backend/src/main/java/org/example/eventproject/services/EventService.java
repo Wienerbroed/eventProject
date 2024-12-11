@@ -1,6 +1,8 @@
 package org.example.eventproject.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.eventproject.models.EventExpenses;
+import org.example.eventproject.models.EventRequirements;
 import org.example.eventproject.models.EventSchedule;
 import org.example.eventproject.repositories.EventRepository;
 import org.example.eventproject.models.Events;
@@ -99,6 +101,32 @@ public class EventService {
         return eventRepository.getEventSchedules();
     }
 
+    public int addEventExpense(EventExpenses expense) {
+        return eventRepository.addEventExpense(expense);
+    }
 
+
+    public int addEventRequirement(EventRequirements requirement) {
+        return eventRepository.addEventRequirement(requirement);
+    }
+
+    public List<EventExpenses> findExpensesByEventId(Long eventId) {
+        return eventRepository.findExpensesByEventId(eventId);
+    }
+
+    public List<EventRequirements> findRequirementsByEventId(Long eventId) {
+        return eventRepository.findRequirementsByEventId(eventId);
+    }
+
+
+    public int deleteRequirementById(Long requirementId) {
+        return eventRepository.deleteRequirementById(requirementId);
+    }
+
+
+
+    public int deleteExpenseById(Long expenseId) {
+        return eventRepository.deleteExpenseById(expenseId);
+    }
 
 }

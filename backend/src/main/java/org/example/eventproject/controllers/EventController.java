@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.example.eventproject.models.EventExpenses;
+import org.example.eventproject.models.EventRequirements;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -110,6 +113,59 @@ public class EventController {
     public ResponseEntity<List<EventSchedule>> getEventSchedules() {
         List<EventSchedule> schedules = eventService.getEventSchedules();
         return ResponseEntity.ok(schedules);
+    }
+
+    @PostMapping("/addExpense/{eventId}")
+    public ResponseEntity<String> addEventExpense(@PathVariable Long eventId, @RequestBody EventExpenses expense) {
+        try {
+            Optional<Events> event = eventService.getEventById(eventId);
+            if (event.isPresent()) {
+                expense.setEvent(event.get());
+                eventService.addEventExpense(expense);
+                return ResponseEntity.ok("Expense added successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event not found with ID: " + eventId);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding expense: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/addRequirement/{eventId}")
+    public ResponseEntity<String> addEventRequirement(@PathVariable Long eventId, @RequestBody EventRequirements requirement) {
+        try {
+            requirement.setEventId(eventId);
+            eventService.addEventRequirement(requirement);
+            return ResponseEntity.ok("Requirement added successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding requirement: " + e.getMessage());
+        }
+    }
+    @DeleteMapping("/requirement/{requirementId}")
+    public ResponseEntity<Void> deleteEventRequirement(@PathVariable Long requirementId) {
+        eventService.deleteRequirementById(requirementId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/expense/{expenseId}")
+    public ResponseEntity<Void> deleteEventExpense(@PathVariable Long expenseId) {
+        eventService.deleteExpenseById(expenseId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+    @GetMapping("/{eventId}/expenses")
+    public ResponseEntity<List<EventExpenses>> getEventExpenses(@PathVariable Long eventId) {
+        List<EventExpenses> expenses = eventService.findExpensesByEventId(eventId);
+        return ResponseEntity.ok(expenses);
+    }
+
+    @GetMapping("/{eventId}/requirements")
+    public ResponseEntity<List<EventRequirements>> getEventRequirements(@PathVariable Long eventId) {
+        List<EventRequirements> requirements = eventService.findRequirementsByEventId(eventId);
+        return ResponseEntity.ok(requirements);
     }
 
 

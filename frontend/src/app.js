@@ -243,6 +243,68 @@ app.put('/api/events/schedule/:scheduleId', async (req, res) => {
     }
 });
 
+// Add a new event expense
+app.post('/api/events/addExpense/:eventId', async (req, res) => {
+    try {
+        const eventId = req.params.eventId; // Get the eventId from the URL
+        const expenseData = req.body; // Get the expense data from the request body
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/addExpense/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(expenseData),
+        });
+
+        if (postResponse.ok) {
+            res.status(201).send('Expense added successfully.');
+        } else {
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).send('Failed to add expense: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error adding expense: ' + error.message);
+    }
+});
+
+// Add a new event requirement
+app.post('/api/events/addRequirement/:eventId', async (req, res) => {
+    try {
+        const eventId = req.params.eventId; // Get the eventId from the URL
+        const requirementData = req.body; // Get the requirement data from the request body
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/addRequirement/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requirementData),
+        });
+
+        if (postResponse.ok) {
+            res.status(201).send('Requirement added successfully.');
+        } else {
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).send('Failed to add requirement: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error adding requirement: ' + error.message);
+    }
+});
+
+// Fetch requirements for a specific event by ID
+app.get('/api/events/:eventId/requirements', async (req, res) => {
+    const eventId = req.params.eventId; // Get the eventId from the URL
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}/requirements`);
+        const requirements = await response.json();
+        res.json(requirements);
+    } catch (error) {
+        res.status(500).send('Error fetching requirements: ' + error.message);
+    }
+});
+
+
+
+
+
 
 
 //------------------------login and registre---------------------------
