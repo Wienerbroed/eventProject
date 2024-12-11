@@ -244,6 +244,32 @@ app.get('/api/events/venue/:venueId', async (req, res) => {
 });
 
 
+app.put('/api/events/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const eventData = req.body;
+
+        const putResponse = await fetch(`http://localhost:8080/api/events/${eventId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+        });
+
+        if (putResponse.ok) {
+            res.status(200).send('Event updated successfully.');
+        } else {
+            const errorText = await putResponse.text();
+            res.status(putResponse.status).send('Failed to update event: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error updating event: ' + error.message);
+    }
+});
+
+
+
+
+
 // Update an event schedule
 app.put('/api/events/schedule/:scheduleId', async (req, res) => {
     const scheduleId = req.params.scheduleId;
@@ -266,6 +292,10 @@ app.put('/api/events/schedule/:scheduleId', async (req, res) => {
         res.status(500).send('Error updating event: ' + error.message);
     }
 });
+
+
+
+
 
 // Add a new event expense
 app.post('/api/events/addExpense/:eventId', async (req, res) => {
