@@ -11,6 +11,7 @@ import org.example.eventproject.models.EventExpenses;
 import org.example.eventproject.models.EventRequirements;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,7 +88,7 @@ public class EventController {
     public ResponseEntity<List<Events>> getEventsByVenue(@PathVariable Long venueId) {
         List<Events> events = eventService.getEventsByVenueId(venueId);
         if (events.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(Collections.emptyList()); // Return an empty JSON array
         }
         return ResponseEntity.ok(events);
     }

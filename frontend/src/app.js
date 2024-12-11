@@ -227,19 +227,27 @@ app.post('/api/events/addSchedule/:eventId', async (req, res) => {
 
 
 
+// Fetch events by venue ID
 app.get('/api/events/venue/:venueId', async (req, res) => {
-    const venueId = req.params.venueId; // Get the venueId from the URL parameter
+    const venueId = req.params.venueId;
 
     try {
         const response = await fetch(`http://localhost:8080/api/events/venue/${venueId}`);
-        const events = await response.json();
-        if (!events) {
-            return res.status(404).json({ message: "No events found for this venue" });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch events for venue ${venueId}: ${response.statusText}`);
         }
-        res.json(events);
+
+        const events = await response.json();
+
+        if (!Array.isArray(events)) {
+            throw new Error('Received invalid data format. Expected an array of events.');
+        }
+
+        res.json(events); // Return the events in the response
     } catch (error) {
-        console.error("Error fetching events by venue:", error);
-        res.status(500).json({ message: "Internal server error" });
+        console.error('Error fetching events by venue:', error.message);
+        res.status(500).send('Error fetching events by venue: ' + error.message); // Return a server error response
     }
 });
 
@@ -319,6 +327,35 @@ app.post('/api/events/addExpense/:eventId', async (req, res) => {
         res.status(500).send('Error adding expense: ' + error.message);
     }
 });
+
+// Fetch expenses for a specific event by ID
+app.get('/api/events/:eventId/expenses', async (req, res) => {
+    const eventId = req.params.eventId; // Get the eventId from the URL
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}/expenses`);
+        const expenses = await response.json();
+        res.json(expenses);
+    } catch (error) {
+        res.status(500).send('Error fetching expenses: ' + error.message);
+    }
+});
+
+// Delete an expense
+app.delete('/api/events/expenses/:expenseId', async (req, res) => {
+    try {
+        const expenseId = req.params.expenseId;
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/expenses/${expenseId}`, { method: 'DELETE' });
+
+        if (deleteResponse.ok) {
+            res.status(204).send('Expense deleted successfully.');
+        } else {
+            res.status(deleteResponse.status).send('Failed to delete expense: ' + deleteResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error deleting expense: ' + error.message);
+    }
+});
+
 
 // Add a new event requirement
 app.post('/api/events/addRequirement/:eventId', async (req, res) => {
