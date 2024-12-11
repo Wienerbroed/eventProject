@@ -32,8 +32,7 @@ const authenticateToken = (req, res, next) => {
     const token = req.cookies.token || req.headers['authorization'];
 
     if (!token) {
-        res.redirect('/loginAndRegisterPage');
-        return res.status(401).send('Access Denied');
+        return res.status(401).redirect('/login');
     }
 
     try {
@@ -41,7 +40,8 @@ const authenticateToken = (req, res, next) => {
         req.user = verified;
         next();
     } catch (err) {
-        res.status(400).send('Invalid Token');
+        res.clearCookie('token'); // Clear the token if it's invalid
+        return res.status(400).redirect('/login');
     }
 };
 
@@ -85,18 +85,6 @@ app.get('/api/events', async (req, res) => {
         res.status(500).send('Error fetching events: ' + error.message);
     }
 });
-
-// Fetch events from the backend API
-app.get('/api/events', async (req, res) => {
-    try {
-        const response = await fetch('http://localhost:8080/api/events');
-        const events = await response.json();
-        res.json(events);
-    } catch (error) {
-        res.status(500).send('Error fetching events: ' + error.message);
-    }
-});
-
 
 
 // Fetch a specific event by ID
