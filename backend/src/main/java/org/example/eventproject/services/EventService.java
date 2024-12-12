@@ -120,8 +120,14 @@ public class EventService {
     }
 
 
-    public int addEventRequirement(EventRequirements requirement) {
-        return eventRepository.addEventRequirement(requirement);
+    public void addEventRequirement(EventRequirements requirement) {
+        Optional<Events> eventOptional = eventRepository.findById(requirement.getEventId());
+        if (eventOptional.isPresent()) {
+            requirement.setEvent(eventOptional.get());
+            eventRepository.addEventRequirement(requirement);
+        } else {
+            throw new RuntimeException("Event not found with ID: " + requirement.getEventId());
+        }
     }
 
     public List<EventExpenses> findExpensesByEventId(Long eventId) {

@@ -195,10 +195,41 @@ public class EventRepository {
         return jdbcTemplate.query(sql, new Object[]{eventId}, new BeanPropertyRowMapper<>(EventExpenses.class));
     }
 
-    // Get requirements by event ID
     public List<EventRequirements> findRequirementsByEventId(Long eventId) {
-        String sql = "SELECT * FROM EventRequirements WHERE event_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{eventId}, new BeanPropertyRowMapper<>(EventRequirements.class));
+        String sql = """
+        SELECT er.requirement_id, er.event_id, er.praktiske_krav, er.tekniske_krav, er.materialebehov, er.gopherbehov,
+               e.event_id AS e_event_id, e.title, e.event_creator, e.event_responsible, e.event_control, e.event_type, e.description, e.max_participants, e.max_audience, e.conguide_dk, e.conguide_en, e.venue_id
+        FROM EventRequirements er
+        JOIN Events e ON er.event_id = e.event_id
+        WHERE er.event_id = ?
+    """;
+
+        return jdbcTemplate.query(sql, new Object[]{eventId}, (rs, rowNum) -> {
+            EventRequirements requirement = new EventRequirements();
+            requirement.setRequirementId(rs.getLong("requirement_id"));
+            requirement.setEventId(rs.getLong("event_id"));
+            requirement.setPraktiskeKrav(rs.getString("praktiske_krav"));
+            requirement.setTekniskeKrav(rs.getString("tekniske_krav"));
+            requirement.setMaterialebehov(rs.getString("materialebehov"));
+            requirement.setGopherbehov(rs.getString("gopherbehov"));
+
+            Events event = new Events();
+            event.setEventId(rs.getLong("e_event_id"));
+            event.setTitle(rs.getString("title"));
+            event.setEventCreator(rs.getString("event_creator"));
+            event.setEventResponsible(rs.getString("event_responsible"));
+            event.setEventControl(rs.getString("event_control"));
+            event.setEventType(rs.getString("event_type"));
+            event.setDescription(rs.getString("description"));
+            event.setMaxParticipants(rs.getInt("max_participants"));
+            event.setMaxAudience(rs.getInt("max_audience"));
+            event.setConguideDk(rs.getString("conguide_dk"));
+            event.setConguideEn(rs.getString("conguide_en"));
+            event.setVenueId(rs.getLong("venue_id"));
+
+            requirement.setEvent(event);
+            return requirement;
+        });
     }
 
     // Delete requirement by event ID
