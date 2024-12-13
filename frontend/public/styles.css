@@ -66,3 +66,8 @@ header {
 .add-event-btn:hover {
     background-color: #45a049; /* Darker green on hover */
 }
+
+/* Ensure emojis are displayed correctly */
+.event p {
+    font-family: Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}

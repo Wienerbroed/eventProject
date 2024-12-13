@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS eventDatabase;
 USE eventDatabase;
 
+ALTER TABLE Events ADD COLUMN warnings VARCHAR(255);
 -- Venue Table
 CREATE TABLE IF NOT EXISTS venue (
                                      venue_id INT AUTO_INCREMENT PRIMARY KEY,

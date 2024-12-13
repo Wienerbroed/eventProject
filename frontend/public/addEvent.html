@@ -41,7 +41,15 @@
   <label for="venueSelect">Venue:</label>
   <select id="venueSelect" name="venueSelect" required>
     <!-- Venues will be dynamically populated here -->
-  </select>
+  </select><br><br>
+
+  <label>Warnings:</label><br>
+  <input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
+  <label for="wheelchair">Wheelchair Accessible</label><br>
+  <input type="checkbox" id="strobelights" name="warnings" value="strobelights">
+  <label for="strobelights">Strobelights</label><br>
+  <input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
+  <label for="loudNoises">Loud Noises</label><br><br>
 
   <button type="submit">Add Event</button>
 </form>
@@ -74,6 +82,10 @@
   document.getElementById('addEventForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
+    const warnings = Array.from(document.querySelectorAll('input[name="warnings"]:checked'))
+                          .map(checkbox => checkbox.value)
+                          .join(',');
+
     const eventData = {
       title: document.getElementById('title').value,
       eventCreator: document.getElementById('eventCreator').value,
@@ -85,7 +97,8 @@
       maxAudience: parseInt(document.getElementById('maxAudience').value),
       conguideDk: document.getElementById('conguideDk').value,
       conguideEn: document.getElementById('conguideEn').value,
-      venueId: document.getElementById('venueSelect').value // Correct ID
+      venueId: document.getElementById('venueSelect').value, // Correct ID
+      warnings: warnings // Warnings field
     };
 
     try {
