@@ -5,10 +5,10 @@ const eventId = urlParams.get('id'); // Use the event ID from the URL parameters
 // Get modal elements
 const scheduleModal = document.getElementById('scheduleModal');
 const expenseModal = document.getElementById('expenseModal');
-const requirementModal = document.getElementById('requirementModal'); // Add this line
+const requirementModal = document.getElementById('requirementModal');
 const addScheduleBtn = document.getElementById('addScheduleBtn');
 const addExpenseBtn = document.getElementById('addExpenseBtn');
-const addRequirementBtn = document.getElementById('addRequirementBtn'); // Add this line
+const addRequirementBtn = document.getElementById('addRequirementBtn');
 const closeBtns = document.querySelectorAll('.close');
 
 // Open modal on button click
@@ -20,17 +20,16 @@ addExpenseBtn.onclick = function () {
     expenseModal.style.display = 'block';
 };
 
-addRequirementBtn.onclick = function () { // Add this function
+addRequirementBtn.onclick = function () {
     requirementModal.style.display = 'block';
 };
-
 
 // Close modal on close button click
 closeBtns.forEach(btn => {
     btn.onclick = function () {
         scheduleModal.style.display = 'none';
         expenseModal.style.display = 'none';
-        requirementModal.style.display = 'none'; // Add this line
+        requirementModal.style.display = 'none';
     };
 });
 
@@ -42,12 +41,12 @@ window.onclick = function (event) {
     if (event.target === expenseModal) {
         expenseModal.style.display = 'none';
     }
-    if (event.target === requirementModal) { // Add this condition
+    if (event.target === requirementModal) {
         requirementModal.style.display = 'none';
     }
 };
 
-// Fetch event details, schedule, and expenses
+// Fetch event details, schedule, expenses, requirements
 async function fetchEventDetails(eventId) {
     try {
         const response = await fetch(`http://localhost:3000/api/events/${eventId}`);
@@ -56,6 +55,7 @@ async function fetchEventDetails(eventId) {
             displayEventDetails(event);
             fetchEventSchedule(eventId);
             fetchEventExpenses(eventId);
+            fetchEventRequirements(eventId); // Fetch requirements as well
         }
     } catch (error) {
         console.error('Error fetching event details:', error);
@@ -75,8 +75,20 @@ function displayEventDetails(event) {
     document.getElementById('conguideDk').value = event.conguideDk;
     document.getElementById('conguideEn').value = event.conguideEn;
     document.getElementById('venueId').value = event.venueId; // Set the venueId
-}
 
+    // Handle warnings
+    const warnings = event.warnings ? event.warnings.split(',') : [];
+    warnings.forEach(w => {
+        const normalized = w.trim().toLowerCase();
+        if (normalized === 'wheelchair') {
+            document.getElementById('wheelchair').checked = true;
+        } else if (normalized === 'strobelights') {
+            document.getElementById('strobelights').checked = true;
+        } else if (normalized === 'loud noises') {
+            document.getElementById('loudNoises').checked = true;
+        }
+    });
+}
 
 async function updateEvent(event) {
     event.preventDefault();
@@ -94,10 +106,17 @@ async function updateEvent(event) {
     const conguideEnElement = document.getElementById('conguideEn');
     const venueIdElement = document.getElementById('venueId');
 
-    if (!titleElement || !eventCreatorElement || !eventResponsibleElement || !eventControlElement || !eventTypeElement || !descriptionElement || !maxParticipantsElement || !maxAudienceElement || !conguideDkElement || !conguideEnElement || !venueIdElement) {
+    if (!titleElement || !eventCreatorElement || !eventResponsibleElement || !eventControlElement ||
+        !eventTypeElement || !descriptionElement || !maxParticipantsElement || !maxAudienceElement ||
+        !conguideDkElement || !conguideEnElement || !venueIdElement) {
         console.error('One or more elements are missing in the DOM');
         return;
     }
+
+    // Gather warnings
+    const selectedWarnings = Array.from(document.querySelectorAll('input[name="warnings"]:checked'))
+        .map(checkbox => checkbox.value)
+        .join(',');
 
     const updatedEvent = {
         title: titleElement.value,
@@ -112,7 +131,8 @@ async function updateEvent(event) {
         conguideEn: conguideEnElement.value,
         venue: {
             venueId: venueIdElement.value,
-        }
+        },
+        warnings: selectedWarnings // Include updated warnings
     };
 
     try {
@@ -136,7 +156,7 @@ async function updateEvent(event) {
 
 document.getElementById('updateEventForm').addEventListener('submit', updateEvent);
 
-
+// Fetch and display event schedule
 async function fetchEventSchedule(eventId) {
     try {
         const response = await fetch(`http://localhost:3000/api/events/${eventId}/schedule`);
@@ -184,6 +204,7 @@ async function deleteSchedule(scheduleId) {
     }
 }
 
+// Fetch and display event expenses
 async function fetchEventExpenses(eventId) {
     try {
         const response = await fetch(`http://localhost:3000/api/events/${eventId}/expenses`);
@@ -231,12 +252,7 @@ async function deleteExpense(expenseId) {
     }
 }
 
-// Initialize data on page load
-if (eventId) {
-    fetchEventDetails(eventId);
-}
-
-// Event form handling (schedules and expenses)
+// Add schedule
 document.getElementById('scheduleForm').addEventListener('submit', function (event) {
     event.preventDefault();
     const scheduleData = {
@@ -262,6 +278,7 @@ document.getElementById('scheduleForm').addEventListener('submit', function (eve
         .catch(error => console.error('Error:', error));
 });
 
+// Add expense
 document.getElementById('expenseForm').addEventListener('submit', function (event) {
     event.preventDefault();
     const expenseData = {
@@ -287,7 +304,6 @@ document.getElementById('expenseForm').addEventListener('submit', function (even
         .catch(error => console.error('Error:', error));
 });
 
-
 // Add Requirement
 document.getElementById('requirementForm').addEventListener('submit', function (event) {
     event.preventDefault();
@@ -307,7 +323,7 @@ document.getElementById('requirementForm').addEventListener('submit', function (
             if (response.ok) {
                 alert('Requirement added successfully!');
                 requirementModal.style.display = 'none';
-                fetchEventRequirements(eventId); // Refresh the requirements list
+                fetchEventRequirements(eventId); // Refresh requirements list
             } else {
                 alert('Failed to add requirement.');
             }
@@ -355,7 +371,7 @@ async function deleteRequirement(requirementId) {
 
         if (response.ok) {
             alert('Requirement deleted successfully!');
-            fetchEventRequirements(eventId); // Refresh the requirements list after deletion
+            fetchEventRequirements(eventId); // Refresh requirements after deletion
         } else {
             alert('Failed to delete requirement.');
         }
@@ -364,10 +380,7 @@ async function deleteRequirement(requirementId) {
     }
 }
 
-
 // Initialize data on page load
 if (eventId) {
     fetchEventDetails(eventId);
-    fetchEventSchedule(eventId)
-    fetchEventRequirements(eventId); // Fetch and display event requirements
 }

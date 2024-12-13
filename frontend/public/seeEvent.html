@@ -68,8 +68,6 @@
                 <label for="expenseCost">Cost:</label>
                 <input type="text" id="expenseCost" name="expenseCost" required>
             </div>
-
-
             <button type="submit">Add Expense</button>
         </form>
     </div>
@@ -172,10 +170,21 @@
         <input type="text" id="conguideEn" name="conguideEn" required>
     </div>
 
+    <!-- Warnings Section -->
+    <div>
+        <label>Warnings:</label><br>
+        <input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
+        <label for="wheelchair">Wheelchair Accessible</label><br>
+
+        <input type="checkbox" id="strobelights" name="warnings" value="strobelights">
+        <label for="strobelights">Strobelights</label><br>
+
+        <input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
+        <label for="loudNoises">Loud Noises</label><br><br>
+    </div>
+
     <button type="submit">Update Event</button>
 </form>
-
-
 
 <script src="js/seeEvent.js"></script>
 </body>
