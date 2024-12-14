@@ -7,16 +7,16 @@ import jakarta.persistence.*;
 public class EventRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "eventRoom_Id")
+    @Column(name = "event_room_id")
     private long eventRoomId;
 
-    @Column(name = "eventRoomName")
+    @Column(name = "event_room_name")
     private String eventRoomName;
 
-    @Column(name = "eventRoomCapacity")
+    @Column(name = "event_room_capacity")
     private int eventRoomCapacity;
 
-    @Column (name = "venue_id")
+    @Column(name = "venue_id")
     private long venueId;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -40,12 +40,11 @@ public class Events {
     @Column(name = "conguide_en", nullable = false)
     private String conguideEn;
 
-    @Column(name = "eventRoom_id", nullable = false)  // Changed to eventRoom_id
-    private Long eventRoomId;  // Foreign key to EventRoom
+    @Column(name = "event_room_id", nullable = false)
+    private Long eventRoomId;
 
-    // Use @ManyToOne to define the relationship with the EventRoom entity
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "eventRoom_id", referencedColumnName = "eventRoom_id", insertable = false, updatable = false)
+    @JoinColumn(name = "event_room_id", referencedColumnName = "event_room_id", insertable = false, updatable = false)
     private EventRoom eventRoom;
 
     // Getters and setters
@@ -137,7 +136,6 @@ public class Events {
         this.conguideEn = conguideEn;
     }
 
-    // Getter and setter for eventRoom relationship
     public EventRoom getEventRoom() {
         return eventRoom;
     }

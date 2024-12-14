@@ -3,6 +3,7 @@ package org.example.eventproject.controllers;
 import org.example.eventproject.models.EventRoom;
 import org.example.eventproject.services.EventRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +30,20 @@ public class EventRoomController {
 
     //Add event
     @PostMapping("/add")
-    public ResponseEntity<EventRoom> addEventRoom(@RequestBody EventRoom eventRoom) {
-        eventRoomService.addEventRoom(eventRoom);
-        return ResponseEntity.ok(eventRoom);
+    public ResponseEntity<?> addEventRoom(@RequestBody EventRoom eventRoom) {
+        if (eventRoom.getEventRoomName() == null || eventRoom.getEventRoomName().isEmpty()) {
+            return ResponseEntity.badRequest().body("Event room name is required.");
+        }
+        if (eventRoom.getVenueId() <= 0) {
+            return ResponseEntity.badRequest().body("A valid venue ID is required.");
+        }
+
+        try {
+            EventRoom createdRoom = eventRoomService.addEventRoom(eventRoom);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdRoom);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating event room: " + e.getMessage());
+        }
     }
 
     //Get event by id

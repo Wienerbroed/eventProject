@@ -184,9 +184,9 @@ app.put('/api/events/schedule/:scheduleId', async (req, res) => {
 // ----------- EventRoom Routes ----------
 
 // Fetch event rooms from the backend API
-app.get('/api/eventRooms', async (req, res) => {
+app.get('/api/eventrooms', async (req, res) => {
     try {
-        const response = await fetch('http://localhost:8080/api/eventRooms');
+        const response = await fetch('http://localhost:8080/api/eventrooms');
         const eventRooms = await response.json();
         res.json(eventRooms);
     } catch (error) {
@@ -195,10 +195,10 @@ app.get('/api/eventRooms', async (req, res) => {
 });
 
 // Fetch a specific event room by ID
-app.get('/api/eventRooms/:id', async (req, res) => {
+app.get('/api/eventrooms/:id', async (req, res) => {
     const roomId = req.params.id;
     try {
-        const response = await fetch(`http://localhost:8080/api/eventRooms/${roomId}`);
+        const response = await fetch(`http://localhost:8080/api/eventrooms/${roomId}`);
         const room = await response.json();
         res.json(room);
     } catch (error) {
@@ -207,30 +207,34 @@ app.get('/api/eventRooms/:id', async (req, res) => {
 });
 
 // Add a new event room
-app.post('/api/eventRooms/add', async (req, res) => {
+app.post('/api/eventrooms/add', async (req, res) => {
     try {
-        const roomData = req.body;
-        const postResponse = await fetch('http://localhost:8080/api/eventRooms/add', {
+        const eventRoomData = req.body;
+        console.log('Adding Event Room:', eventRoomData);
+
+        const postResponse = await fetch('http://localhost:8080/api/eventrooms/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(roomData),
+            body: JSON.stringify(eventRoomData),
         });
 
         if (postResponse.ok) {
             res.status(201).send('Event room added successfully.');
         } else {
-            res.status(postResponse.status).send('Failed to add event room: ' + postResponse.statusText);
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).send('Failed to add event room: ' + errorText);
         }
     } catch (error) {
-        res.status(500).send('Error adding event room: ' + error.message);
+        console.error('Error adding event room:', error);
+        res.status(500).send('Internal server error: ' + error.message);
     }
 });
 
 // Delete an event room
-app.delete('/api/eventRooms/:id', async (req, res) => {
+app.delete('/api/eventrooms/:id', async (req, res) => {
     try {
         const roomId = req.params.id;
-        const deleteResponse = await fetch(`http://localhost:8080/api/eventRooms/${roomId}`, { method: 'DELETE' });
+        const deleteResponse = await fetch(`http://localhost:8080/api/eventrooms/${roomId}`, { method: 'DELETE' });
 
         if (deleteResponse.ok) {
             res.status(204).send('Event room deleted successfully.');

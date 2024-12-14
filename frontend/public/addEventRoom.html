@@ -47,33 +47,37 @@
   document.addEventListener('DOMContentLoaded', populateVenueDropdown);
 
   // Form submission logic
-  document.getElementById('addEventRoomForm').addEventListener('submit', async function(event) {
+  document.getElementById('addEventRoomForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const eventRoomData = {
-      roomName: document.getElementById('roomName').value,
-      capacity: parseInt(document.getElementById('capacity').value),
-      venueId: document.getElementById('venueSelect').value // Correct ID
+      eventRoomName: document.getElementById('roomName').value,
+      eventRoomCapacity: parseInt(document.getElementById('capacity').value),
+      venueId: parseInt(document.getElementById('venueSelect').value)
     };
+
+    if (!eventRoomData.venueId) {
+      alert('Please select a valid venue.');
+      return;
+    }
 
     try {
       const response = await fetch('http://localhost:3000/api/eventrooms/add', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventRoomData)
       });
 
       if (response.ok) {
         alert('Event Room added successfully!');
-        window.location.href = 'eventroom.html'; // Redirect to event rooms page
+        window.location.reload();
       } else {
-        alert('Failed to add Event Room.');
+        const errorText = await response.text();
+        alert(`Failed to add Event Room: ${errorText}`);
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred.');
+      console.error('Error during submission:', error);
+      alert('An error occurred while adding the event room.');
     }
   });
 </script>
