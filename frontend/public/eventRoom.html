@@ -18,33 +18,47 @@
 
 <script>
   // Function to fetch Event Rooms
+  // Function to fetch Event Rooms and their associated venues
   async function fetchEventRooms() {
     try {
-      const response = await fetch('http://localhost:3000/api/eventrooms');
-      if (!response.ok) {
+      const eventRoomsResponse = await fetch('http://localhost:3000/api/eventrooms');
+      if (!eventRoomsResponse.ok) {
         throw new Error('Failed to fetch event rooms');
       }
-      const eventRooms = await response.json();
-      displayEventRooms(eventRooms);
+      const eventRooms = await eventRoomsResponse.json();
+
+      // Fetch venues and store them in a dictionary for quick lookup by venueId
+      const venuesResponse = await fetch('http://localhost:3000/api/venues');
+      if (!venuesResponse.ok) {
+        throw new Error('Failed to fetch venues');
+      }
+      const venues = await venuesResponse.json();
+      const venueMap = venues.reduce((acc, venue) => {
+        acc[venue.venueId] = venue; // Map venueId to the venue data
+        return acc;
+      }, {});
+
+      displayEventRooms(eventRooms, venueMap);
     } catch (error) {
       console.error('Error:', error);
     }
   }
 
-  // Function to display the fetched Event Rooms
-  function displayEventRooms(eventRooms) {
+  // Function to display the fetched Event Rooms with associated venue details
+  function displayEventRooms(eventRooms, venueMap) {
     const eventRoomsContainer = document.getElementById('eventRoomsContainer');
     eventRoomsContainer.innerHTML = '';
 
     eventRooms.forEach(eventRoom => {
+      const venue = venueMap[eventRoom.venueId]; // Get the venue details using venueId
       const eventRoomElement = document.createElement('div');
       eventRoomElement.classList.add('event-room');
       eventRoomElement.innerHTML = `
-            <h2 onclick="window.location.href='seeEventRoom.html?id=${eventRoom.eventRoomId}'">${eventRoom.roomName}</h2>
-            <p><strong>Capacity:</strong> ${eventRoom.capacity}</p>
-            <p><strong>Venue:</strong> ${eventRoom.venue.venueName} (${eventRoom.venue.venueAddress})</p>
-            <button class="delete-btn" onclick="deleteEventRoom(${eventRoom.eventRoomId})">Delete</button>
-        `;
+      <h2 onclick="window.location.href='seeEventRoom.html?id=${eventRoom.eventRoomId}'">${eventRoom.roomName}</h2>
+      <p><strong>Capacity:</strong> ${eventRoom.capacity}</p>
+      <p><strong>Venue:</strong> ${venue ? venue.venueName : 'N/A'} (${venue ? venue.venueAddress : 'N/A'})</p>
+      <button class="delete-btn" onclick="deleteEventRoom(${eventRoom.eventRoomId})">Delete</button>
+    `;
       eventRoomsContainer.appendChild(eventRoomElement);
     });
   }
@@ -61,7 +75,7 @@
 
       if (response.ok) {
         alert('Event Room deleted successfully!');
-        fetchEventRooms(); // Refresh the event room list after deletion
+        await fetchEventRooms(); // Refresh the event room list after deletion
       } else {
         alert('Failed to delete Event Room.');
       }
