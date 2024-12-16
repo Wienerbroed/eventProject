@@ -59,4 +59,6 @@ public class EventRoomService {
     public List<EventRoom> getEventRoomsByVenueId(long venueId) {
         return eventRoomRepository.getEventRoomByVenueId(venueId);
     }
+
+
 }
