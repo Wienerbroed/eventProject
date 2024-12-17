@@ -61,24 +61,34 @@ public class EventService {
     }
 
     public Events updateEvent(Events event) {
-        if (!eventRepository.existsById(event.getEventId())) {
-            throw new EntityNotFoundException("Event not found with ID: " + event.getEventId());
+        Long eventId = event.getEventId();
+        if (!eventRepository.existsById(eventId)) {
+            throw new EntityNotFoundException("Event not found with ID: " + eventId);
         }
 
-        // Fetch the existing event to get the current venue information
-        Optional<Events> existingEventOpt = eventRepository.findById(event.getEventId());
-        if (existingEventOpt.isPresent()) {
-            Events existingEvent = existingEventOpt.get();
-            if (event.getVenue() == null) {
-                event.setVenue(existingEvent.getVenue());
-            }
+        Optional<Events> existingEventOpt = eventRepository.findById(eventId);
+        if (existingEventOpt.isEmpty()) {
+            throw new EntityNotFoundException("Event not found with ID: " + eventId);
         }
 
-        // Ensure the venue is not null before updating
+        Events existingEvent = existingEventOpt.get();
+
+        // If no venue is provided, keep the existing one
+        if (event.getVenue() == null) {
+            event.setVenue(existingEvent.getVenue());
+        }
+
+        // If warnings are not provided in the updated event, keep the existing warnings
+        if (event.getWarnings() == null || event.getWarnings().trim().isEmpty()) {
+            event.setWarnings(existingEvent.getWarnings());
+        }
+
+        // Ensure the venue is not null
         if (event.getVenue() == null) {
             throw new IllegalArgumentException("Venue cannot be null");
         }
 
+        // Now call the repository update method, which includes the warnings field
         eventRepository.updateEvent(event);
         return event;
     }
