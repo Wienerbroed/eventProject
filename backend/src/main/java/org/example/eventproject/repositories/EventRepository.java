@@ -63,14 +63,16 @@ public class EventRepository {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Events.class));
     }
 
-    public List<Events> getAllEventsWithEventRoomDetails() {
+    public List<Events> getAllEventsWithEventRoomAndVenueDetails() {
         String sql = """
-    SELECT e.event_id, e.title, e.event_creator, e.event_responsible, 
-           e.event_control, e.event_type, e.description, 
-           e.max_participants, e.max_audience, e.conguide_dk, 
-           e.conguide_en, e.warnings, er.event_room_id, er.event_room_name, er.event_room_capacity
+    SELECT e.event_id, e.title, e.event_creator, e.event_responsible,
+           e.event_control, e.event_type, e.description,
+           e.max_participants, e.max_audience, e.conguide_dk,
+           e.conguide_en, e.warnings, er.event_room_id, er.event_room_name,
+           er.event_room_capacity, v.venue_id, v.venue_name, v.venue_address
     FROM Events e
     JOIN EventRoom er ON e.event_room_id = er.event_room_id
+    JOIN Venue v ON er.venue_id = v.venue_id
     """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -95,6 +97,14 @@ public class EventRepository {
             eventRoom.setEventRoomName(rs.getString("event_room_name"));
             eventRoom.setEventRoomCapacity(rs.getInt("event_room_capacity"));
 
+            // Create a Venue instance and set it to the EventRoom
+            Venue venue = new Venue();
+            venue.setVenueId(rs.getLong("venue_id"));
+            venue.setVenueName(rs.getString("venue_name"));
+            venue.setVenueAddress(rs.getString("venue_address"));
+
+            // Set the venue in the eventRoom object
+            eventRoom.setVenue(venue);
 
             // Set the eventRoom in the event object
             event.setEventRoom(eventRoom);

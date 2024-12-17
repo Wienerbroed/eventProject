@@ -48,9 +48,9 @@ public class EventService {
     }
 
     // Service method to fetch all events with event room details
-    public List<Events> getAllEventsWithEventRoomDetails() {
+    public List<Events> getAllEventsWithEventRoomAndVenueDetails() {
         // Call the repository method to fetch events with event room details
-        return eventRepository.getAllEventsWithEventRoomDetails();
+        return eventRepository.getAllEventsWithEventRoomAndVenueDetails();
     }
 
 

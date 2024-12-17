@@ -26,9 +26,15 @@ public class EventController {
 
     // Get All Events with Event Room Details
     @GetMapping()
-    public ResponseEntity<List<Events>> getAllEventsWithEventRoomDetails() {
-        List<Events> events = eventService.getAllEventsWithEventRoomDetails();
-        return ResponseEntity.ok(events);
+    public ResponseEntity<List<Events>> getAllEventsWithEventRoomAndVenueDetails() {
+        try {
+            List<Events> events = eventService.getAllEventsWithEventRoomAndVenueDetails();
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            // Log the error for debugging
+            System.err.println("Error fetching events: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/byVenueName")

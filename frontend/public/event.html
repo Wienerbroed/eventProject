@@ -42,27 +42,27 @@
             console.debug("Processing event:", event);
             const warnings = getWarningEmojis(event.warnings);
 
-            const venueName = event.venue ? event.venue.venueName : 'N/A';
-            const venueAddress = event.venue ? event.venue.venueAddress : 'Address not available';
+            const venueName = event.eventRoom && event.eventRoom.venue ? event.eventRoom.venue.venueName : 'N/A';
+            const venueAddress = event.eventRoom && event.eventRoom.venue ? event.eventRoom.venue.venueAddress : 'Address not available';
 
             const eventElement = document.createElement('div');
             eventElement.classList.add('event');
             eventElement.innerHTML = `
-            <h2 onclick="window.location.href='seeEvent.html?id=${event.eventId}'">${event.title}</h2>
-            <p><strong>Creator:</strong> ${event.eventCreator || 'Unknown'}</p>
-            <p><strong>Responsible:</strong> ${event.eventResponsible || 'N/A'}</p>
-            <p><strong>Control:</strong> ${event.eventControl || 'N/A'}</p>
-            <p><strong>Type:</strong> ${event.eventType || 'N/A'}</p>
-            <p><strong>Description:</strong> ${event.description || 'No description provided'}</p>
-            <p><strong>Max Participants:</strong> ${event.maxParticipants || 'N/A'}</p>
-            <p><strong>Max Audience:</strong> ${event.maxAudience || 'N/A'}</p>
-            <p><strong>Guide (DK):</strong> ${event.conguideDk || 'N/A'}</p>
-            <p><strong>Guide (EN):</strong> ${event.conguideEn || 'N/A'}</p>
-            <p><strong>Venue:</strong> ${venueName} (${venueAddress})</p>
-            <p><strong>Warnings:</strong> ${warnings}</p>
-            <p><strong>Event Room:</strong> ${event.eventRoom.eventRoomName}</p>
-            <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
-        `;
+        <h2 onclick="window.location.href='seeEvent.html?id=${event.eventId}'">${event.title}</h2>
+        <p><strong>Creator:</strong> ${event.eventCreator || 'Unknown'}</p>
+        <p><strong>Responsible:</strong> ${event.eventResponsible || 'N/A'}</p>
+        <p><strong>Control:</strong> ${event.eventControl || 'N/A'}</p>
+        <p><strong>Type:</strong> ${event.eventType || 'N/A'}</p>
+        <p><strong>Description:</strong> ${event.description || 'No description provided'}</p>
+        <p><strong>Max Participants:</strong> ${event.maxParticipants || 'N/A'}</p>
+        <p><strong>Max Audience:</strong> ${event.maxAudience || 'N/A'}</p>
+        <p><strong>Guide (DK):</strong> ${event.conguideDk || 'N/A'}</p>
+        <p><strong>Guide (EN):</strong> ${event.conguideEn || 'N/A'}</p>
+        <p><strong>Venue:</strong> ${venueName} (${venueAddress})</p>
+        <p><strong>Warnings:</strong> ${warnings}</p>
+        <p><strong>Event Room:</strong> ${event.eventRoom.eventRoomName}</p>
+        <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
+    `;
             eventsContainer.appendChild(eventElement);
         });
     }
