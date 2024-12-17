@@ -1,6 +1,8 @@
 CREATE DATABASE IF NOT EXISTS eventDatabase;
 USE eventDatabase;
 
+
+
 -- Venue Table
 CREATE TABLE IF NOT EXISTS venue (
                                      venue_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -49,7 +51,8 @@ CREATE TABLE IF NOT EXISTS EventExpenses (
 
 -- Event Requirements Table
 CREATE TABLE IF NOT EXISTS EventRequirements (
-                                                 event_id INT PRIMARY KEY,
+                                                 requirements_id INT AUTO_INCREMENT PRIMARY KEY,
+                                                 event_id INT ,
                                                  praktiske_krav TEXT,
                                                  tekniske_krav TEXT,
                                                  materialebehov TEXT,

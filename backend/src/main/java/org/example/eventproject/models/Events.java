@@ -46,8 +46,14 @@ public class Events {
     @Column(name = "warnings", nullable = false)
     private String warnings;
 
-    @Column(name = "venue", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venue_id", referencedColumnName = "venue_id", insertable = false, updatable = false)
     private Venue venue;
+
+
+    @Column(name = "venue_id", nullable = false)
+    private Long venueId; // Add this field
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_room_id", referencedColumnName = "event_room_id", insertable = false, updatable = false)
@@ -170,6 +176,14 @@ public class Events {
         return venue;
     }
 
+
+    public Long getVenueId() {
+        return venueId;
+    }
+
+    public void setVenueId(Long venueId) {
+        this.venueId = venueId;
+    }
 
     public void setVenue(Venue venue) {
         this.venue = venue;

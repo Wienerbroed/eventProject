@@ -22,8 +22,8 @@ public class EventRepository {
 
     // Add Event
     public int addEvent(Events event) {
-        String sql = "INSERT INTO Events (title, event_creator, event_responsible, event_control, event_type, description, max_participants, max_audience, conguide_dk, conguide_en, event_room_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(), event.getEventRoomId());
+        String sql = "INSERT INTO Events (title, event_creator, event_responsible, event_control, event_type, description, max_participants, max_audience, conguide_dk, conguide_en, warnings, event_room_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(), event.getWarnings(), event.getEventRoomId());
     }
 
     // Find Event by ID
@@ -48,7 +48,7 @@ public class EventRepository {
     SELECT e.event_id, e.title, e.event_creator, e.event_responsible, 
            e.event_control, e.event_type, e.description, 
            e.max_participants, e.max_audience, e.conguide_dk, 
-           e.conguide_en, er.event_room_id, er.event_room_name, er.event_room_capacity
+           e.conguide_en, e.warnings, er.event_room_id, er.event_room_name, er.event_room_capacity
     FROM Events e
     JOIN EventRoom er ON e.event_room_id = er.event_room_id
     """;
@@ -123,8 +123,8 @@ public class EventRepository {
 
     // Update Event
     public int updateEvent(Events event) {
-        String sql = "UPDATE Events SET title = ?, event_creator = ?, event_responsible = ?, event_control = ?, event_type = ?, description = ?, max_participants = ?, max_audience = ?, conguide_dk = ?, conguide_en = ?, event_room_id = ? WHERE event_id = ?";
-        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(), event.getEventRoomId(), event.getEventId());
+        String sql = "UPDATE Events SET title = ?, event_creator = ?, event_responsible = ?, event_control = ?, event_type = ?, description = ?, max_participants = ?, max_audience = ?, conguide_dk = ?, conguide_en = ?, warnings= ?, event_room_id = ? WHERE event_id = ?";
+        return jdbcTemplate.update(sql, event.getTitle(), event.getEventCreator(), event.getEventResponsible(), event.getEventControl(), event.getEventType(), event.getDescription(), event.getMaxParticipants(), event.getMaxAudience(), event.getConguideDk(), event.getConguideEn(), event.getWarnings(), event.getEventRoomId(), event.getEventId());
     }
 
     public List<Events> getEventsByEventRoomId(Long eventRoomId) {
