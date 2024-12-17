@@ -22,8 +22,12 @@ public class EventRoomRepository {
 
     public int addEventRoom(EventRoom eventRoom) {
         String sql = "INSERT INTO EventRoom (event_room_name, event_room_capacity, venue_id) VALUES (?, ?, ?)";
-        return jdbcTemplate.update(sql, eventRoom.getEventRoomName(), eventRoom.getEventRoomCapacity(), eventRoom.getVenueId());
+        return jdbcTemplate.update(sql,
+                eventRoom.getEventRoomName(),
+                eventRoom.getEventRoomCapacity(),
+                eventRoom.getVenueId());
     }
+
 
     public Optional<EventRoom> findEventRoomById(Long id) {
         String sql = """

@@ -9,14 +9,18 @@
 <body>
 <header>
     <h1>All Events</h1>
-    <button class="venue-btn" onclick="window.location.href='venues.html'">Go to Event Rooms</button>
+    <button class="venue-btn" onclick="window.location.href='venues'">Go to Venues</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
 </header>
+
 <div>
     <button class="add-event-btn" onclick="window.location.href='addEvent.html';">Add Event</button>
 </div>
+
 <div id="eventsContainer"></div>
 
 <script>
+    // Function to fetch events from the backend
     async function fetchEvents() {
         try {
             const response = await fetch('http://localhost:3000/api/events');
@@ -24,30 +28,39 @@
                 throw new Error('Failed to fetch events');
             }
             const events = await response.json();
-            displayEvents(events);
+            displayEvents(events); // Display fetched events
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
+    // Function to display events in the container
     function displayEvents(events) {
         const eventsContainer = document.getElementById('eventsContainer');
-        eventsContainer.innerHTML = '';
+        eventsContainer.innerHTML = ''; // Clear the container before adding new events
 
         events.forEach(event => {
+            console.debug("Processing event:", event);
+            const warnings = getWarningEmojis(event.warnings);
+
+            const venueName = event.venue ? event.venue.venueName : 'N/A';
+            const venueAddress = event.venue ? event.venue.venueAddress : 'Address not available';
+
             const eventElement = document.createElement('div');
             eventElement.classList.add('event');
             eventElement.innerHTML = `
             <h2 onclick="window.location.href='seeEvent.html?id=${event.eventId}'">${event.title}</h2>
-            <p><strong>Creator:</strong> ${event.eventCreator}</p>
-            <p><strong>Responsible:</strong> ${event.eventResponsible}</p>
-            <p><strong>Control:</strong> ${event.eventControl}</p>
-            <p><strong>Type:</strong> ${event.eventType}</p>
-            <p><strong>Description:</strong> ${event.description}</p>
-            <p><strong>Max Participants:</strong> ${event.maxParticipants}</p>
-            <p><strong>Max Audience:</strong> ${event.maxAudience}</p>
-            <p><strong>Guide (DK):</strong> ${event.conguideDk}</p>
-            <p><strong>Guide (EN):</strong> ${event.conguideEn}</p>
+            <p><strong>Creator:</strong> ${event.eventCreator || 'Unknown'}</p>
+            <p><strong>Responsible:</strong> ${event.eventResponsible || 'N/A'}</p>
+            <p><strong>Control:</strong> ${event.eventControl || 'N/A'}</p>
+            <p><strong>Type:</strong> ${event.eventType || 'N/A'}</p>
+            <p><strong>Description:</strong> ${event.description || 'No description provided'}</p>
+            <p><strong>Max Participants:</strong> ${event.maxParticipants || 'N/A'}</p>
+            <p><strong>Max Audience:</strong> ${event.maxAudience || 'N/A'}</p>
+            <p><strong>Guide (DK):</strong> ${event.conguideDk || 'N/A'}</p>
+            <p><strong>Guide (EN):</strong> ${event.conguideEn || 'N/A'}</p>
+            <p><strong>Venue:</strong> ${venueName} (${venueAddress})</p>
+            <p><strong>Warnings:</strong> ${warnings}</p>
             <p><strong>Event Room:</strong> ${event.eventRoom.eventRoomName}</p>
             <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
         `;
@@ -55,6 +68,43 @@
         });
     }
 
+    // A dedicated function that takes a warnings string and returns a string of emojis
+    function getWarningEmojis(warningsStr) {
+        if (!warningsStr || typeof warningsStr !== 'string' || warningsStr.trim() === '') {
+            console.debug("No warnings provided or warnings string empty.");
+            return 'None';
+        }
+
+        const warningEmojis = {
+            'wheelchair': '♿',
+            'strobelights': '⚠️',
+            'loud noises': '🔊'
+        };
+
+        const warningDescriptions = {
+            'wheelchair': 'This event is wheelchair accessible.',
+            'strobelights': 'This event may include strobelights, which can affect individuals with photosensitive conditions.',
+            'loud noises': 'This event features loud noises. Consider bringing ear protection.'
+        };
+
+        const warningsArray = warningsStr.split(',');
+
+        // Map each warning to an emoji with a tooltip
+        const emojiArray = warningsArray.map(warning => {
+            const normalizedWarning = warning.trim().toLowerCase();
+            const emoji = warningEmojis[normalizedWarning] || '❗';
+            const description = warningDescriptions[normalizedWarning] || 'Unknown warning condition.';
+            console.debug(`Mapping warning "${warning}" to "${emoji}" with description: "${description}"`);
+            return `<span class="warning-emoji" title="${description}" style="cursor: help;">${emoji}</span>`;
+        });
+
+        const emojiStr = emojiArray.join(' ');
+        console.debug("Final emoji string with tooltips:", emojiStr);
+        return emojiStr;
+    }
+
+
+    // Function to handle event deletion
     async function deleteEvent(eventId) {
         const confirmation = confirm("Are you sure you want to delete this event?");
         if (!confirmation) return;
@@ -66,7 +116,7 @@
 
             if (response.ok) {
                 alert('Event deleted successfully!');
-                await fetchEvents(); // Refresh the event list after deletion
+                fetchEvents(); // Refresh the event list after deletion
             } else {
                 alert('Failed to delete event.');
             }
@@ -76,7 +126,22 @@
         }
     }
 
-    // Fetch and display events when the page loads
+    // Logout function
+    async function logout() {
+        try {
+            const response = await fetch('http://localhost:3000/api/logout');
+            if (response.ok) {
+                window.location.href = 'login';
+            } else {
+                alert('Failed to log out.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        }
+    }
+
+    // Fetch events when the page loads
     window.onload = fetchEvents;
 </script>
 </body>

@@ -3,6 +3,8 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cookieParser from 'cookie-parser';
+import jwt from 'jsonwebtoken';
 
 // Helper to get __dirname since it's not available in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -10,6 +12,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SECRET_KEY = 'BabskiOgJagger'; // Replace with your actual secret key
+const expiresIn = '1h'; // Token expiration time
 
 // Start the server
 app.listen(PORT, () => {
@@ -20,33 +24,86 @@ app.listen(PORT, () => {
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public'))); // Serve static files from the 'public' folder
+app.use(cookieParser());
+
+
+// Middleware to check authentication
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.token || req.headers['authorization'];
+
+    if (!token) {
+        return res.status(401).redirect('/login');
+    }
+
+    try {
+        const verified = jwt.verify(token, SECRET_KEY);
+        req.user = verified;
+        next();
+    } catch (err) {
+        res.clearCookie('token'); // Clear the token if it's invalid
+        return res.status(400).redirect('/login');
+    }
+};
+
 
 // ---------- Event Routes ----------
 
+
+// Serve `loginAndRegisterPage.html` at `/loginAndRegisterPage` route
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'loginAndRegisterPage.html'));
+});
+
+
 // Serve `event.html` at the `/events` route
-app.get('/events', (req, res) => {
+app.get('/events', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'event.html'));
 });
 
 // Serve `addEvent.html` at the `/events/add` route
-app.get('/events/add', (req, res) => {
+app.get('/events/add', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'addEvent.html'));
 });
 
 // Serve `seeEvent.html` at the `/events/:id` route
-app.get('/events/:id', (req, res) => {
+app.get('/events/:id', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'seeEvent.html'));
 });
 
 // Serve `eventRoom.html` at the `/eventRoom/:id` route
-app.get('/eventRoom/:id', (req, res) => {
+app.get('/eventRoom/:id', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'eventRoom.html'));
 });
 
-// Serve `addEventRoom.html` at the `/eventRoom/add` route
-app.get('/eventRoom/add', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'addEventRoom.html'));
+// Serve `venues.html` at the `/venues` route
+app.get('/venues', authenticateToken, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
 });
+
+
+app.get('/venues/:id', authenticateToken, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
+});
+
+
+// calender route
+app.get('/eventCalender', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'eventCalender.html'));
+});
+
+
+// Fetch event rooms from the backend API
+app.get('/api/eventrooms', async (req, res) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/eventrooms');
+        const eventRooms = await response.json();
+        res.json(eventRooms);
+    } catch (error) {
+        res.status(500).send('Error fetching event rooms: ' + error.message);
+    }
+});
+
+//------------------------EVENT---------------------------
 
 // Serve `addEventSchedule.html` at the `/events/addSchedule` route
 app.get('/events/addSchedule', (req, res) => {
@@ -54,6 +111,8 @@ app.get('/events/addSchedule', (req, res) => {
     console.log('Event ID:', eventId);
     res.sendFile(path.join(__dirname, '..', 'public', 'addEventSchedule.html'));
 });
+
+
 
 // Fetch events from the backend API
 app.get('/api/events', async (req, res) => {
@@ -65,6 +124,7 @@ app.get('/api/events', async (req, res) => {
         res.status(500).send('Error fetching events: ' + error.message);
     }
 });
+
 
 // Fetch a specific event by ID
 app.get('/api/events/:id', async (req, res) => {
@@ -113,30 +173,55 @@ app.delete('/api/events/:id', async (req, res) => {
         res.status(500).send('Error deleting event: ' + error.message);
     }
 });
-
-// Add a new event schedule
-app.post('/api/events/addSchedule/:eventId', async (req, res) => {
+// Delete a schedule
+app.delete('/api/events/schedule/:scheduleId', async (req, res) => {
     try {
-        const eventId = req.params.eventId;
-        const scheduleData = req.body;
+        const scheduleId = req.params.scheduleId;
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/schedule/${scheduleId}`, { method: 'DELETE' });
 
-        const postResponse = await fetch(`http://localhost:8080/api/events/addSchedule/${eventId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(scheduleData),
-        });
-
-        if (postResponse.ok) {
-            res.status(201).send('Schedule added successfully.');
+        if (deleteResponse.ok) {
+            res.status(204).send('Schedule deleted successfully.');
         } else {
-            res.status(postResponse.status).send('Failed to add schedule: ' + postResponse.statusText);
+            res.status(deleteResponse.status).send('Failed to delete schedule: ' + deleteResponse.statusText);
         }
     } catch (error) {
-        res.status(500).send('Error adding schedule: ' + error.message);
+        res.status(500).send('Error deleting schedule: ' + error.message);
     }
 });
 
-// Fetch a specific event's schedule by ID
+// Update an existing event
+app.post('/api/events/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const eventData = req.body;
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+        });
+
+        if (postResponse.ok) {
+            res.status(200).send('Event updated successfully.');
+        } else {
+            res.status(postResponse.status).send('Failed to update event: ' + postResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error updating event: ' + error.message);
+    }
+});
+// Fetch a specific event by ID
+app.get('/api/events/:id', async (req, res) => {
+    const eventId = req.params.id;
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}`);
+        const event = await response.json();
+        res.json(event);
+    } catch (error) {
+        res.status(500).send('Error fetching event: ' + error.message);
+    }
+});
+// Fetch a specific event schedule by ID
 app.get('/api/events/:eventId/schedule', async (req, res) => {
     const eventId = req.params.eventId;
     try {
@@ -148,7 +233,7 @@ app.get('/api/events/:eventId/schedule', async (req, res) => {
     }
 });
 
-// Fetch event schedules
+// Fetch event schedules from the backend API
 app.get('/api/events/schedules', async (req, res) => {
     try {
         const response = await fetch('http://localhost:8080/api/events/schedules');
@@ -159,7 +244,84 @@ app.get('/api/events/schedules', async (req, res) => {
     }
 });
 
-// Update event schedule
+app.post('/api/events/addSchedule/:eventId', async (req, res) => {
+    try {
+        const eventId = req.params.eventId; // Get the eventId from the URL
+        const scheduleData = req.body; // Get the schedule data from the request body
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/addSchedule/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(scheduleData),
+        });
+
+        if (postResponse.ok) {
+            res.status(201).send('Schedule added successfully.');
+        } else {
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).send('Failed to add schedule: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error adding schedule: ' + error.message);
+    }
+});
+
+
+
+
+
+// Fetch events by venue ID
+app.get('/api/events/venue/:venueId', async (req, res) => {
+    const venueId = req.params.venueId;
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/venue/${venueId}`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch events for venue ${venueId}: ${response.statusText}`);
+        }
+
+        const events = await response.json();
+
+        if (!Array.isArray(events)) {
+            throw new Error('Received invalid data format. Expected an array of events.');
+        }
+
+        res.json(events); // Return the events in the response
+    } catch (error) {
+        console.error('Error fetching events by venue:', error.message);
+        res.status(500).send('Error fetching events by venue: ' + error.message); // Return a server error response
+    }
+});
+
+
+app.put('/api/events/:id', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const eventData = req.body;
+
+        const putResponse = await fetch(`http://localhost:8080/api/events/${eventId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+        });
+
+        if (putResponse.ok) {
+            res.status(200).send('Event updated successfully.');
+        } else {
+            const errorText = await putResponse.text();
+            res.status(putResponse.status).send('Failed to update event: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error updating event: ' + error.message);
+    }
+});
+
+
+
+
+
+// Update an event schedule
 app.put('/api/events/schedule/:scheduleId', async (req, res) => {
     const scheduleId = req.params.scheduleId;
     const updatedSchedule = req.body;
@@ -168,31 +330,112 @@ app.put('/api/events/schedule/:scheduleId', async (req, res) => {
         const response = await fetch(`http://localhost:8080/api/events/schedule/${scheduleId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedSchedule),
+            body: JSON.stringify(updatedSchedule)
         });
 
         if (response.ok) {
-            res.status(200).send('Event schedule updated successfully.');
+            res.status(200).send('Event updated successfully.');
         } else {
-            res.status(response.status).send('Error updating event schedule: ' + response.statusText);
+            const errorText = await response.text();
+            res.status(response.status).send('Error updating event: ' + errorText);
         }
     } catch (error) {
-        res.status(500).send('Error updating event schedule: ' + error.message);
+        res.status(500).send('Error updating event: ' + error.message);
     }
 });
 
-// ----------- EventRoom Routes ----------
 
-// Fetch event rooms from the backend API
-app.get('/api/eventrooms', async (req, res) => {
+
+
+
+// Add a new event expense
+app.post('/api/events/addExpense/:eventId', async (req, res) => {
     try {
-        const response = await fetch('http://localhost:8080/api/eventrooms');
-        const eventRooms = await response.json();
-        res.json(eventRooms);
+        const eventId = req.params.eventId; // Get the eventId from the URL
+        const expenseData = req.body; // Get the expense data from the request body
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/addExpense/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(expenseData),
+        });
+
+        if (postResponse.ok) {
+            res.status(201).send('Expense added successfully.');
+        } else {
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).send('Failed to add expense: ' + errorText);
+        }
     } catch (error) {
-        res.status(500).send('Error fetching event rooms: ' + error.message);
+        res.status(500).send('Error adding expense: ' + error.message);
     }
 });
+
+// Fetch expenses for a specific event by ID
+app.get('/api/events/:eventId/expenses', async (req, res) => {
+    const eventId = req.params.eventId; // Get the eventId from the URL
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}/expenses`);
+        const expenses = await response.json();
+        res.json(expenses);
+    } catch (error) {
+        res.status(500).send('Error fetching expenses: ' + error.message);
+    }
+});
+
+// Delete an expense
+app.delete('/api/events/expense/:expenseId', async (req, res) => {
+    try {
+        const expenseId = req.params.expenseId;
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/expense/${expenseId}`, { method: 'DELETE' });
+
+        if (deleteResponse.ok) {
+            res.status(204).send('Expense deleted successfully.');
+        } else {
+            res.status(deleteResponse.status).send('Failed to delete expense: ' + deleteResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error deleting expense: ' + error.message);
+    }
+});
+
+
+// Add a new event requirement
+app.post('/api/events/addRequirement/:eventId', async (req, res) => {
+    try {
+        const eventId = req.params.eventId; // Get the eventId from the URL
+        const requirementData = req.body; // Get the requirement data from the request body
+
+        const postResponse = await fetch(`http://localhost:8080/api/events/addRequirement/${eventId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requirementData),
+        });
+
+        if (postResponse.ok) {
+            res.status(201).send('Requirement added successfully.');
+        } else {
+            const errorText = await postResponse.text();
+            res.status(postResponse.status).send('Failed to add requirement: ' + errorText);
+        }
+    } catch (error) {
+        res.status(500).send('Error adding requirement: ' + error.message);
+    }
+});
+
+// Fetch requirements for a specific event by ID
+app.get('/api/events/:eventId/requirements', async (req, res) => {
+    const eventId = req.params.eventId; // Get the eventId from the URL
+    try {
+        const response = await fetch(`http://localhost:8080/api/events/${eventId}/requirements`);
+        const requirements = await response.json();
+        res.json(requirements);
+    } catch (error) {
+        res.status(500).send('Error fetching requirements: ' + error.message);
+    }
+});
+
+
 
 // Fetch a specific event room by ID
 app.get('/api/eventrooms/venue/:id', async (req, res) => {
@@ -246,19 +489,36 @@ app.delete('/api/eventrooms/:id', async (req, res) => {
     }
 });
 
-// Login and Register Routes
 
-app.get('/loginAndRegisterPage', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'loginAndRegisterPage.html'));
+// Delete a requirement
+app.delete('/api/events/requirement/:eventId', async (req, res) => {
+    try {
+        const eventId = req.params.eventId;
+        const deleteResponse = await fetch(`http://localhost:8080/api/events/requirement/${eventId}`, { method: 'DELETE' });
+
+        if (deleteResponse.ok) {
+            res.status(204).send('Requirement deleted successfully.');
+        } else {
+            res.status(deleteResponse.status).send('Failed to delete requirement: ' + deleteResponse.statusText);
+        }
+    } catch (error) {
+        res.status(500).send('Error deleting requirement: ' + error.message);
+    }
 });
 
+// Login and Register
+
+
+// Handle user registration
 app.post('/api/register', async (req, res) => {
     try {
         const { username, password, email } = req.body;
+
+        // Forward the data to the Spring Boot API
         const response = await fetch('http://localhost:8080/api/loginAndRegister/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, email }),
+            body: JSON.stringify({ username, password, email })
         });
 
         if (response.ok) {
@@ -267,20 +527,24 @@ app.post('/api/register', async (req, res) => {
             res.status(response.status).send('Failed to register user.');
         }
     } catch (error) {
+        console.error('Error registering user:', error);
         res.status(500).send('Error registering user: ' + error.message);
     }
 });
 
+// Handle user login
 app.post('/api/login', async (req, res) => {
     try {
         const loginData = req.body;
         const response = await fetch('http://localhost:8080/api/loginAndRegister/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(loginData),
+            body: JSON.stringify(loginData)
         });
 
         if (response.ok) {
+            const token = jwt.sign({ username: loginData.username }, SECRET_KEY, { expiresIn: '1h' });
+            res.cookie('token', token, { httpOnly: true });
             res.status(200).send('Login successful.');
         } else {
             res.status(401).send('Invalid username or password.');
@@ -290,15 +554,16 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Venue Routes
-app.get('/venues', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
+//Handle USer logout
+app.get('/api/logout', (req, res) => {
+    res.clearCookie('token');
+    res.status(200).send('User logged out successfully.');
 });
 
-app.get('/venues/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'venues.html'));
-});
 
+// --------------------- Venue  --------------
+
+// Fetch events from the backend API
 app.get('/api/venues', async (req, res) => {
     try {
         const response = await fetch('http://localhost:8080/api/venues');
@@ -309,6 +574,7 @@ app.get('/api/venues', async (req, res) => {
     }
 });
 
+// Fetch a specific event by ID'
 app.get('/api/venues/:id', async (req, res) => {
     const venueId = req.params.id;
     try {
@@ -320,13 +586,14 @@ app.get('/api/venues/:id', async (req, res) => {
     }
 });
 
+// Add a new venue
 app.post('/api/venues/add', async (req, res) => {
     try {
         const venueData = req.body;
         const postResponse = await fetch('http://localhost:8080/api/venues/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(venueData),
+            body: JSON.stringify(venueData)
         });
 
         if (postResponse.ok) {
@@ -356,7 +623,11 @@ app.delete('/api/venues/:id', async (req, res) => {
     }
 });
 
-// Calendar Route
-app.get('/eventCalender', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'eventCalender.html'));
-});
+
+
+
+// calender -----------------
+
+
+
+
