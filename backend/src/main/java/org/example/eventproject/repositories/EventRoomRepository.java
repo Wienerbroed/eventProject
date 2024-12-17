@@ -25,14 +25,32 @@ public class EventRoomRepository {
         return jdbcTemplate.update(sql, eventRoom.getEventRoomName(), eventRoom.getEventRoomCapacity(), eventRoom.getVenueId());
     }
 
-    // Find event room by id
     public Optional<EventRoom> findEventRoomById(Long id) {
-        String sql = "SELECT * FROM EventRoom WHERE event_room_id = ?";
-        try{
-            EventRoom eventRoom = jdbcTemplate.queryForObject(sql, new Object[]{id}, new BeanPropertyRowMapper<>(EventRoom.class));
-            return Optional.ofNullable(eventRoom);
+        String sql = """
+        SELECT e.event_room_id, e.event_room_name, e.event_room_capacity, e.venue_id,
+               v.venue_id AS v_venue_id, v.venue_name, v.venue_address
+        FROM EventRoom e
+        LEFT JOIN Venue v ON e.venue_id = v.venue_id
+        WHERE e.event_room_id = ?
+    """;
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
+                EventRoom eventRoom = new EventRoom();
+                eventRoom.setEventRoomId(rs.getLong("event_room_id"));
+                eventRoom.setEventRoomName(rs.getString("event_room_name"));
+                eventRoom.setEventRoomCapacity(rs.getInt("event_room_capacity"));
+                eventRoom.setVenueId(rs.getLong("venue_id"));
+
+                Venue venue = new Venue();
+                venue.setVenueId(rs.getLong("v_venue_id"));
+                venue.setVenueName(rs.getString("venue_name"));
+                venue.setVenueAddress(rs.getString("venue_address"));
+
+                eventRoom.setVenue(venue);
+                return Optional.of(eventRoom);
+            });
         } catch (EmptyResultDataAccessException e) {
-            return Optional.empty(); // Return Optional.empty if no event is found
+            return Optional.empty();
         }
     }
 

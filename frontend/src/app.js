@@ -195,7 +195,7 @@ app.get('/api/eventrooms', async (req, res) => {
 });
 
 // Fetch a specific event room by ID
-app.get('/api/eventrooms/:id', async (req, res) => {
+app.get('/api/eventrooms/venue/:id', async (req, res) => {
     const roomId = req.params.id;
     try {
         const response = await fetch(`http://localhost:8080/api/eventrooms/${roomId}`);
