@@ -108,9 +108,9 @@
                     <button class="delete-btn" data-id="${venue.venueId}">Delete</button>
                 `;
 
-                // Wrap the venue box in a clickable link
+                // Link each venue to its event rooms page
                 venueElement.addEventListener('click', () => {
-                    window.location.href = `eventsByVenue.html?venueId=${venue.venueId}`;
+                    window.location.href = `eventroomsByVenue.html?venueId=${venue.venueId}`;
                 });
 
                 // Add event listener to the delete button
@@ -124,6 +124,7 @@
                 venueContainer.appendChild(venueElement);
             });
         }
+
 
 
         function viewVenueDetails(name, address) {

@@ -45,40 +45,40 @@
   <label for="conguideEn">Guide (EN):</label>
   <textarea id="conguideEn" name="conguideEn" required></textarea><br><br>
 
-  <label for="venueSelect">Venue:</label>
-  <select id="venueSelect" name="venueSelect" required>
-    <!-- Venues will be dynamically populated here -->
-  </select><br><br>
+    <label>Warnings:</label><br>
+    <input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
+    <label for="wheelchair">Wheelchair Accessible</label><br>
+    <input type="checkbox" id="strobelights" name="warnings" value="strobelights">
+    <label for="strobelights">Strobelights</label><br>
+    <input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
+    <label for="loudNoises">Loud Noises</label><br><br>
 
-  <label>Warnings:</label><br>
-  <input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
-  <label for="wheelchair">Wheelchair Accessible</label><br>
-  <input type="checkbox" id="strobelights" name="warnings" value="strobelights">
-  <label for="strobelights">Strobelights</label><br>
-  <input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
-  <label for="loudNoises">Loud Noises</label><br><br>
+  <label for="eventRoomSelect">Event Room:</label>
+  <select id="eventRoomSelect" name="eventRoomSelect" required>
+    <!-- Event rooms will be dynamically populated here -->
+  </select>
 
   <button type="submit">Add Event</button>
 </form>
 
 <script>
-  // Function to populate venues dynamically
-  async function populateVenueDropdown() {
+  // Function to populate event rooms dynamically
+  async function populateEventRoomDropdown() {
     try {
-      const response = await fetch('http://localhost:3000/api/venues');
-      if (!response.ok) throw new Error('Failed to fetch venues');
+      const response = await fetch('http://localhost:3000/api/eventrooms'); // Updated API endpoint for Event Rooms
+      if (!response.ok) throw new Error('Failed to fetch event rooms');
 
-      const venues = await response.json();
-      const venueSelect = document.getElementById('venueSelect');
+      const eventRooms = await response.json();
+      const eventRoomSelect = document.getElementById('eventRoomSelect');
 
-      venues.forEach(venue => {
+      eventRooms.forEach(eventRoom => {
         const option = document.createElement('option');
-        option.value = venue.venueId; // Use venue_id as the value
-        option.textContent = venue.venueName; // Display venue_name
-        venueSelect.appendChild(option);
+        option.value = eventRoom.eventRoomId; // Use eventRoomId as the value
+        option.textContent = eventRoom.eventRoomName; // Display eventRoomName
+        eventRoomSelect.appendChild(option);
       });
     } catch (error) {
-      console.error('Error fetching venues:', error);
+      console.error('Error fetching event rooms:', error);
     }
   }
 
@@ -98,7 +98,7 @@
   }
 
   // Call the function on page load
-  document.addEventListener('DOMContentLoaded', populateVenueDropdown);
+  document.addEventListener('DOMContentLoaded', populateEventRoomDropdown);
 
   // Form submission logic
   document.getElementById('addEventForm').addEventListener('submit', async function(event) {
@@ -119,8 +119,8 @@
       maxAudience: parseInt(document.getElementById('maxAudience').value),
       conguideDk: document.getElementById('conguideDk').value,
       conguideEn: document.getElementById('conguideEn').value,
-      venueId: document.getElementById('venueSelect').value, // Correct ID
       warnings: warnings // Warnings field
+      eventRoomId: document.getElementById('eventRoomSelect').value // Correct ID for Event Room
     };
 
     try {

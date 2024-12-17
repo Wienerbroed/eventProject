@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Rooms by Venue</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Event Rooms at Venue</h1>
+</header>
+<div id="eventRoomsContainer"></div>
+
+<script>
+  // Function to fetch Event Rooms by Venue
+  async function fetchEventRoomsByVenue() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const venueId = urlParams.get('venueId');
+
+    if (!venueId) {
+      alert('Venue ID is missing');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/eventrooms/venue/${venueId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch event rooms for this venue');
+      }
+      const eventRoom = await response.json();
+      console.log('Fetched event room:', eventRoom); // Debugging statement
+      if (eventRoom && typeof eventRoom === 'object') {
+        displayEventRoom(eventRoom);
+      } else {
+        console.error('Unexpected response format:', eventRoom); // Log unexpected format
+        throw new Error('Unexpected response format');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Function to display Event Room
+  function displayEventRoom(eventRoom) {
+    const eventRoomsContainer = document.getElementById('eventRoomsContainer');
+    eventRoomsContainer.innerHTML = '';
+
+    console.log('Displaying event room:', eventRoom); // Debugging statement
+    const eventRoomElement = document.createElement('div');
+    eventRoomElement.classList.add('event-room');
+    eventRoomElement.innerHTML = `
+      <h2>${eventRoom.eventRoomName}</h2>
+      <p><strong>Capacity:</strong> ${eventRoom.eventRoomCapacity}</p>
+    `;
+    eventRoomsContainer.appendChild(eventRoomElement);
+  }
+
+  // Fetch and display Event Room when the page loads
+  window.onload = fetchEventRoomsByVenue;
+</script>
+</body>
+</html>

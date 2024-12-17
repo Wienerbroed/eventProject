@@ -27,18 +27,10 @@ public class EventController {
     }
 
 
-    // Get All Events
+    // Get All Events with Event Room Details
     @GetMapping()
-    public ResponseEntity<List<Events>> getAllEventsWithVenueDetails() {
-        List<Events> events = eventService.getAllEventsWithVenueDetails();
-        System.out.println("Fetched events: " + events);  // Log the events
-        return ResponseEntity.ok(events);
-    }
-    // Get All Events
-    @GetMapping("all")
-    public ResponseEntity<List<Events>> getAllEvents() {
-        List<Events> events = eventService.getAllEvents();
-        System.out.println("Fetched events: " + events);  // Log the events
+    public ResponseEntity<List<Events>> getAllEventsWithEventRoomDetails() {
+        List<Events> events = eventService.getAllEventsWithEventRoomDetails();
         return ResponseEntity.ok(events);
     }
 
@@ -77,6 +69,7 @@ public class EventController {
         eventService.deleteEvent(eventId);
         return ResponseEntity.noContent().build();
     }
+    // Update Event
     @PostMapping("/{eventId}")
     public ResponseEntity<Events> updateEventPost(@PathVariable Long eventId, @RequestBody Events event) {
         // Ensure the event has the correct ID
@@ -113,9 +106,10 @@ public class EventController {
     }
 
 
-    @GetMapping("/venue/{venueId}")
-    public ResponseEntity<List<Events>> getEventsByVenue(@PathVariable Long venueId) {
-        List<Events> events = eventService.getEventsByVenueId(venueId);
+    // Get Events by Event Room ID
+    @GetMapping("/eventRoom/{eventRoomId}")
+    public ResponseEntity<List<Events>> getEventsByEventRoom(@PathVariable Long eventRoomId) {
+        List<Events> events = eventService.getEventsByEventRoomId(eventRoomId);
         if (events.isEmpty()) {
             return ResponseEntity.ok(Collections.emptyList()); // Return an empty JSON array
         }

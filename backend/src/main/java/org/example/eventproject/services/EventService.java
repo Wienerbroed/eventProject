@@ -45,10 +45,10 @@ public class EventService {
         return eventRepository.findAll();
     }
 
-    // Service method to fetch all events with venue details
-    public List<Events> getAllEventsWithVenueDetails() {
-        // Call the repository method to fetch events with venue details
-        return eventRepository.getAllEventsWithVenueDetails();
+    // Service method to fetch all events with event room details
+    public List<Events> getAllEventsWithEventRoomDetails() {
+        // Call the repository method to fetch events with event room details
+        return eventRepository.getAllEventsWithEventRoomDetails();
     }
 
 
@@ -95,8 +95,9 @@ public class EventService {
 
 
 
-    public List<Events> getEventsByVenueId(Long venueId) {
-        return eventRepository.getEventsByVenueId(venueId);
+    // Get Events by Event Room ID
+    public List<Events> getEventsByEventRoomId(Long eventRoomId) {
+        return eventRepository.getEventsByEventRoomId(eventRoomId);
     }
 
 

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Room Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    #eventDetailsContainer,
+    form {
+      margin: 1rem auto;
+      padding: 1rem;
+      max-width: 800px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 2rem;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    textarea {
+      resize: vertical;
+      grid-column: span 2;
+    }
+
+    button {
+      grid-column: span 2;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      padding: 0.7rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    @media (max-width: 600px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        grid-column: 1;
+      }
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.4);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 5px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Schedule item styling */
+    .schedule-item {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Event Room Details</h1>
+</header>
+<div id="eventDetailsContainer"></div>
+
+<!-- Schedule Display -->
+<div id="scheduleList" style="margin: 1rem auto; padding: 1rem; max-width: 800px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+  <h2>Schedule</h2>
+</div>
+
+<!-- Add Schedule Button -->
+<div class="button-container">
+  <button id="addScheduleBtn">Add Schedule</button>
+</div>
+
+<!-- Modal -->
+<div id="scheduleModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Add Schedule</h2>
+    <form id="scheduleForm">
+      <div>
+        <label for="scheduleDate">Date:</label>
+        <input type="date" id="scheduleDate" name="scheduleDate" required>
+      </div>
+      <div>
+        <label for="startTime">Start Time:</label>
+        <input type="time" id="startTime" name="startTime" required>
+      </div>
+      <div>
+        <label for="endTime">End Time:</label>
+        <input type="time" id="endTime" name="endTime" required>
+      </div>
+      <button type="submit">Add Schedule</button>
+    </form>
+  </div>
+</div>
+
+<!-- Event Room Update Form -->
+<form id="updateEventRoomForm">
+  <input type="hidden" id="roomId" name="roomId">
+
+  <div>
+    <label for="roomName">Room Name:</label>
+    <input type="text" id="roomName" name="roomName" required>
+  </div>
+
+  <div>
+    <label for="capacity">Capacity:</label>
+    <input type="number" id="capacity" name="capacity" required>
+  </div>
+
+  <div>
+    <label for="venueName">Venue Name:</label>
+    <input type="text" id="venueName" name="venueName" required>
+  </div>
+
+  <div>
+    <label for="venueAddress">Venue Address:</label>
+    <input type="text" id="venueAddress" name="venueAddress" required>
+  </div>
+
+  <button type="submit">Update Event Room</button>
+</form>
+
+<script>
+  // Get modal elements
+  const modal = document.getElementById('scheduleModal');
+  const btn = document.getElementById('addScheduleBtn');
+  const closeBtn = document.querySelector('.close');
+
+  // Open modal on button click
+  btn.onclick = function () {
+    modal.style.display = 'block';
+  };
+
+  // Close modal on close button click
+  closeBtn.onclick = function () {
+    modal.style.display = 'none';
+  };
+
+  // Close modal when clicking outside of it
+  window.onclick = function (event) {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  };
+
+  // Handle form submission for adding schedule
+  document.getElementById('scheduleForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const roomId = urlParams.get('id');
+    const scheduleData = {
+      scheduleDate: document.getElementById('scheduleDate').value,
+      startTime: document.getElementById('startTime').value,
+      endTime: document.getElementById('endTime').value,
+    };
+
+    fetch(`http://localhost:3000/api/eventrooms/addSchedule/${roomId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scheduleData),
+    })
+            .then((response) => {
+              if (response.ok) {
+                alert('Schedule added successfully!');
+                modal.style.display = 'none';
+                fetchEventRoomSchedule(roomId);
+              } else {
+                alert('Failed to add schedule.');
+              }
+            })
+            .catch((error) => console.error('Error:', error));
+  });
+
+  // Fetch Event Room details
+  async function fetchEventRoomDetails(roomId) {
+    try {
+      const response = await fetch(`http://localhost:3000/api/eventrooms/${roomId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch event room details');
+      }
+      const eventRoom = await response.json();
+      displayEventRoomDetails(eventRoom);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  function displayEventRoomDetails(eventRoom) {
+    document.getElementById('roomId').value = eventRoom.roomId;
+    document.getElementById('roomName').value = eventRoom.roomName;
+    document.getElementById('capacity').value = eventRoom.capacity;
+  }
+
+  // Fetch Event Room schedule
+  function fetchEventRoomSchedule(roomId) {
+    fetch(`http://localhost:3000/api/eventrooms/${roomId}/schedule`)
+            .then((response) => response.json())
+            .then((schedule) => displayEventRoomSchedule(schedule))
+            .catch((error) => console.error('Error:', error));
+  }
+
+  function displayEventRoomSchedule(schedule) {
+    const scheduleList = document.getElementById('scheduleList');
+    scheduleList.innerHTML = '';
+
+    schedule.forEach(item => {
+      const scheduleItem = document.createElement('div');
+      scheduleItem.className = 'schedule-item';
+      scheduleItem.innerHTML = `
+            <p><strong>Date:</strong> ${item.scheduleDate}</p>
+            <p><strong>Start Time:</strong> ${item.startTime}</p>
+            <p><strong>End Time:</strong> ${item.endTime}</p>
+            <button class="delete-btn" onclick="deleteSchedule(${item.scheduleId})">Delete</button>
+        `;
+      scheduleList.appendChild(scheduleItem);
+    });
+  }
+
+  // Delete Schedule
+  async function deleteSchedule(scheduleId) {
+    const confirmation = confirm("Are you sure you want to delete this schedule?");
+    if (!confirmation) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/eventrooms/schedule/${scheduleId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert('Schedule deleted successfully!');
+        fetchEventRoomSchedule(roomId);
+      } else {
+        alert('Failed to delete schedule.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Get room ID from URL and fetch details
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('id');
+
+  if (roomId) {
+    fetchEventRoomDetails(roomId);
+    fetchEventRoomSchedule(roomId);
+  }
+</script>
+</body>
+</html>

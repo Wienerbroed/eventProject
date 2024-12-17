@@ -15,6 +15,10 @@
     <button class="logout-btn" onclick="logout()">Logout</button>
 </header>
 
+<div>
+    <button class="add-event-btn" onclick="window.location.href='addEvent.html';">Add Event</button>
+</div>
+
 <div id="eventsContainer"></div>
 
 <script>
@@ -26,7 +30,7 @@
                 throw new Error('Failed to fetch events');
             }
             const events = await response.json();
-            displayEvents(events); // Display fetched events
+            displayEvents(events);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -59,6 +63,7 @@
             <p><strong>Guide (EN):</strong> ${event.conguideEn || 'N/A'}</p>
             <p><strong>Venue:</strong> ${venueName} (${venueAddress})</p>
             <p><strong>Warnings:</strong> ${warnings}</p>
+            <p><strong>Event Room:</strong> ${event.eventRoom.eventRoomName}</p>
             <button class="delete-btn" onclick="deleteEvent(${event.eventId})">Delete</button>
         `;
             eventsContainer.appendChild(eventElement);
@@ -137,6 +142,7 @@
             alert('An error occurred.');
         }
     }
+
 
     // Fetch events when the page loads
     window.onload = fetchEvents;

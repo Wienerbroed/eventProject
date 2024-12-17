@@ -8,6 +8,15 @@ CREATE TABLE IF NOT EXISTS venue (
                                      venue_address VARCHAR(50) NOT NULL
 );
 
+-- Event Room Table
+CREATE TABLE IF NOT EXISTS EventRoom (
+                                         event_room_id INT AUTO_INCREMENT PRIMARY KEY,
+                                         event_room_name VARCHAR(50) NOT NULL,
+                                         event_room_capacity INT NOT NULL,
+                                         venue_id INT DEFAULT NULL,
+                                         FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE SET NULL
+);
+
 -- Events Table
 CREATE TABLE IF NOT EXISTS Events (
                                       event_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,8 +30,10 @@ CREATE TABLE IF NOT EXISTS Events (
                                       max_audience INT NOT NULL,
                                       conguide_dk TEXT NOT NULL,
                                       conguide_en TEXT NOT NULL,
-                                      venue_id INT,
+                                      venue_id INT DEFAULT NULL,
                                       warnings VARCHAR(255),
+                                      event_room_id INT DEFAULT NULL,
+                                      FOREIGN KEY (event_room_id) REFERENCES EventRoom(event_room_id) ON DELETE SET NULL,
                                       FOREIGN KEY (venue_id) REFERENCES venue(venue_id) ON DELETE SET NULL
 );
 
@@ -34,7 +45,7 @@ CREATE TABLE IF NOT EXISTS EventExpenses (
                                              prize TEXT,
                                              cost TEXT,
                                              FOREIGN KEY (event_id) REFERENCES Events(event_id)
-);
+    );
 
 -- Event Requirements Table
 CREATE TABLE IF NOT EXISTS EventRequirements (
@@ -44,7 +55,7 @@ CREATE TABLE IF NOT EXISTS EventRequirements (
                                                  materialebehov TEXT,
                                                  gopherbehov TEXT,
                                                  FOREIGN KEY (event_id) REFERENCES Events(event_id) ON DELETE CASCADE
-);
+    );
 
 -- Event Schedule Table
 CREATE TABLE IF NOT EXISTS EventSchedule (
@@ -54,13 +65,13 @@ CREATE TABLE IF NOT EXISTS EventSchedule (
                                              start_time TIME,
                                              end_time TIME,
                                              FOREIGN KEY (event_id) REFERENCES Events(event_id)
-);
+    );
 
 -- Login Table
 CREATE TABLE IF NOT EXISTS login (
                                      id INT AUTO_INCREMENT PRIMARY KEY,
                                      username VARCHAR(30) NOT NULL UNIQUE,
-                                     password VARCHAR(255) NOT NULL,
+                                     password VARCHAR(255) NOT NULL,  -- Increased to accommodate hashed passwords
                                      email VARCHAR(50) NOT NULL UNIQUE,
                                      role VARCHAR(20) NOT NULL DEFAULT 'USER'
 );

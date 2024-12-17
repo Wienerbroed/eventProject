@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Event Room</title>
+</head>
+<body>
+<h1>Add Event Room</h1>
+<form id="addEventRoomForm">
+  <label for="roomName">Room Name:</label>
+  <input type="text" id="roomName" name="roomName" required><br><br>
+
+  <label for="capacity">Capacity:</label>
+  <input type="number" id="capacity" name="capacity" min="1" required><br><br>
+
+  <label for="venueSelect">Venue:</label>
+  <select id="venueSelect" name="venueSelect" required>
+    <!-- Venues will be dynamically populated here -->
+  </select><br><br>
+
+  <button type="submit">Add Event Room</button>
+</form>
+
+<script>
+  // Function to populate venues dynamically
+  async function populateVenueDropdown() {
+    try {
+      const response = await fetch('http://localhost:3000/api/venues');
+      if (!response.ok) throw new Error('Failed to fetch venues');
+
+      const venues = await response.json();
+      const venueSelect = document.getElementById('venueSelect');
+
+      venues.forEach(venue => {
+        const option = document.createElement('option');
+        option.value = venue.venueId; // Use venue_id as the value
+        option.textContent = venue.venueName; // Display venue_name
+        venueSelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error fetching venues:', error);
+    }
+  }
+
+  // Call the function on page load
+  document.addEventListener('DOMContentLoaded', populateVenueDropdown);
+
+  // Form submission logic
+  document.getElementById('addEventRoomForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const eventRoomData = {
+      eventRoomName: document.getElementById('roomName').value,
+      eventRoomCapacity: parseInt(document.getElementById('capacity').value),
+      venueId: parseInt(document.getElementById('venueSelect').value)
+    };
+
+    if (!eventRoomData.venueId) {
+      alert('Please select a valid venue.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/eventrooms/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventRoomData)
+      });
+
+      if (response.ok) {
+        alert('Event Room added successfully!');
+        window.location.reload();
+      } else {
+        const errorText = await response.text();
+        alert(`Failed to add Event Room: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Error during submission:', error);
+      alert('An error occurred while adding the event room.');
+    }
+  });
+</script>
+</body>
+</html>

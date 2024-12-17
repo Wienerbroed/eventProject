@@ -40,15 +40,18 @@ public class Events {
     @Column(name = "conguide_en", nullable = false)
     private String conguideEn;
 
-    @Column(name = "venue_id", nullable = false)
-    private Long venueId;  // This is the foreign key field
+    @Column(name = "event_room_id", nullable = false)
+    private Long eventRoomId;
 
     @Column(name = "warnings", nullable = false)
     private String warnings;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "venue_id", referencedColumnName = "venue_id", insertable = false, updatable = false)
+    @Column(name = "venue", nullable = false)
     private Venue venue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_room_id", referencedColumnName = "event_room_id", insertable = false, updatable = false)
+    private EventRoom eventRoom;
 
     // Getters and setters
     public Long getEventId() {
@@ -139,12 +142,20 @@ public class Events {
         this.conguideEn = conguideEn;
     }
 
-    public Long getVenueId() {
-        return venueId;
+    public EventRoom getEventRoom() {
+        return eventRoom;
     }
 
-    public void setVenueId(Long venueId) {
-        this.venueId = venueId;
+    public void setEventRoom(EventRoom eventRoom) {
+        this.eventRoom = eventRoom;
+    }
+
+    public Long getEventRoomId() {
+        return eventRoomId;
+    }
+
+    public void setEventRoomId(Long eventRoomId) {
+        this.eventRoomId = eventRoomId;
     }
 
     public String getWarnings() {
@@ -158,6 +169,7 @@ public class Events {
     public Venue getVenue() {
         return venue;
     }
+
 
     public void setVenue(Venue venue) {
         this.venue = venue;

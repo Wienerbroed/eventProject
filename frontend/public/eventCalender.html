@@ -153,15 +153,17 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedEvent),
           });
+
           if (!response.ok) throw new Error('Failed to update event');
           alert('Event updated successfully!');
         } catch (error) {
           console.error('Error updating event:', error);
           alert('Failed to update event. Reverting changes.');
-          info.revert();
+          info.revert(); // Revert to original position
         }
-      }
+      },
     });
+
 
     calendar.render();
   });
