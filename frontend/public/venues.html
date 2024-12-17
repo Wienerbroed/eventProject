@@ -8,13 +8,13 @@
 <body>
 <header>
     <h1>Venues</h1>
+    <button id="addVenueBtn">Add Venue</button>
     <button class="event-btn" onclick="window.location.href='event.html'">Go to Events</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+
 </header>
 
 <div id="venueContainer"></div>
-
-<!-- Trigger/Open The Modal -->
-<button id="addVenueBtn">Add Venue</button>
 
 <!-- The Modal for Adding Venue -->
 <div id="addVenueModal" class="modal">
@@ -197,6 +197,22 @@
                 console.error('Error:', error);
             }
         }
+
+        // Logout function
+        async function logout() {
+            try {
+                const response = await fetch('http://localhost:3000/api/logout');
+                if (response.ok) {
+                    window.location.href = 'loginAndRegisterPage.html';
+                } else {
+                    alert('Failed to log out.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred.');
+            }
+        }
+
 
 
 

@@ -6,6 +6,7 @@
   <title>Event Calendar with Day View</title>
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.15/main.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -47,7 +48,10 @@
   </style>
 </head>
 <body>
-<h1 style="text-align: center;">Event Calendar with Scheduling</h1>
+<header>
+  <h1>Event Calendar with Scheduling</h1>
+  <button class="event-btn" onclick="window.location.href='event.html'">Go to Event</button>
+</header>
 
 <div class="view-buttons">
   <button onclick="changeView('dayGridMonth')">Month View</button>
