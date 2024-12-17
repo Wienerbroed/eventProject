@@ -28,12 +28,12 @@
       if (!response.ok) {
         throw new Error('Failed to fetch event rooms for this venue');
       }
-      const eventRoom = await response.json();
-      console.log('Fetched event room:', eventRoom); // Debugging statement
-      if (eventRoom && typeof eventRoom === 'object') {
-        displayEventRoom(eventRoom);
+      const eventRooms = await response.json();
+      console.log('Fetched event rooms:', eventRooms); // Debugging statement
+      if (Array.isArray(eventRooms)) {
+        displayEventRooms(eventRooms);
       } else {
-        console.error('Unexpected response format:', eventRoom); // Log unexpected format
+        console.error('Unexpected response format:', eventRooms); // Log unexpected format
         throw new Error('Unexpected response format');
       }
     } catch (error) {
@@ -41,22 +41,24 @@
     }
   }
 
-  // Function to display Event Room
-  function displayEventRoom(eventRoom) {
+  // Function to display Event Rooms
+  function displayEventRooms(eventRooms) {
     const eventRoomsContainer = document.getElementById('eventRoomsContainer');
     eventRoomsContainer.innerHTML = '';
 
-    console.log('Displaying event room:', eventRoom); // Debugging statement
-    const eventRoomElement = document.createElement('div');
-    eventRoomElement.classList.add('event-room');
-    eventRoomElement.innerHTML = `
-      <h2>${eventRoom.eventRoomName}</h2>
-      <p><strong>Capacity:</strong> ${eventRoom.eventRoomCapacity}</p>
-    `;
-    eventRoomsContainer.appendChild(eventRoomElement);
+    eventRooms.forEach(eventRoom => {
+      console.log('Displaying event room:', eventRoom); // Debugging statement
+      const eventRoomElement = document.createElement('div');
+      eventRoomElement.classList.add('event-room');
+      eventRoomElement.innerHTML = `
+        <h2>${eventRoom.eventRoomName}</h2>
+        <p><strong>Capacity:</strong> ${eventRoom.eventRoomCapacity}</p>
+      `;
+      eventRoomsContainer.appendChild(eventRoomElement);
+    });
   }
 
-  // Fetch and display Event Room when the page loads
+  // Fetch and display Event Rooms when the page loads
   window.onload = fetchEventRoomsByVenue;
 </script>
 </body>
