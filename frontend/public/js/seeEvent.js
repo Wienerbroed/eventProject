@@ -74,85 +74,65 @@ function displayEventDetails(event) {
     document.getElementById('maxAudience').value = event.maxAudience;
     document.getElementById('conguideDk').value = event.conguideDk;
     document.getElementById('conguideEn').value = event.conguideEn;
-    document.getElementById('venueId').value = event.venueId; // Set the venueId
+
+    // Set the eventRoomId hidden field
+    document.getElementById('eventRoomId').value = event.eventRoomId;
+
+    // Display Event Room Name and Address if needed
+    document.getElementById('eventRoomName').value = event.eventRoom?.eventRoomName || '';
+    document.getElementById('eventRoomAddress').value = event.eventRoom?.eventRoomAddress || '';
 
     // Handle warnings
     const warnings = event.warnings ? event.warnings.split(',') : [];
     warnings.forEach(w => {
         const normalized = w.trim().toLowerCase();
-        if (normalized === 'wheelchair') {
-            document.getElementById('wheelchair').checked = true;
-        } else if (normalized === 'strobelights') {
-            document.getElementById('strobelights').checked = true;
-        } else if (normalized === 'loud noises') {
-            document.getElementById('loudNoises').checked = true;
-        }
+        if (normalized === 'wheelchair') document.getElementById('wheelchair').checked = true;
+        if (normalized === 'strobelights') document.getElementById('strobelights').checked = true;
+        if (normalized === 'loud noises') document.getElementById('loudNoises').checked = true;
     });
 }
 
+
+
 async function updateEvent(event) {
     event.preventDefault();
-    const eventId = document.getElementById('eventId').value;
-
-    const titleElement = document.getElementById('title');
-    const eventCreatorElement = document.getElementById('eventCreator');
-    const eventResponsibleElement = document.getElementById('eventResponsible');
-    const eventControlElement = document.getElementById('eventControl');
-    const eventTypeElement = document.getElementById('eventType');
-    const descriptionElement = document.getElementById('description');
-    const maxParticipantsElement = document.getElementById('maxParticipants');
-    const maxAudienceElement = document.getElementById('maxAudience');
-    const conguideDkElement = document.getElementById('conguideDk');
-    const conguideEnElement = document.getElementById('conguideEn');
-    const venueIdElement = document.getElementById('venueId');
-
-    if (!titleElement || !eventCreatorElement || !eventResponsibleElement || !eventControlElement ||
-        !eventTypeElement || !descriptionElement || !maxParticipantsElement || !maxAudienceElement ||
-        !conguideDkElement || !conguideEnElement || !venueIdElement) {
-        console.error('One or more elements are missing in the DOM');
-        return;
-    }
-
-    // Gather warnings
-    const selectedWarnings = Array.from(document.querySelectorAll('input[name="warnings"]:checked'))
-        .map(checkbox => checkbox.value)
-        .join(',');
 
     const updatedEvent = {
-        title: titleElement.value,
-        eventCreator: eventCreatorElement.value,
-        eventResponsible: eventResponsibleElement.value,
-        eventControl: eventControlElement.value,
-        eventType: eventTypeElement.value,
-        description: descriptionElement.value,
-        maxParticipants: maxParticipantsElement.value,
-        maxAudience: maxAudienceElement.value,
-        conguideDk: conguideDkElement.value,
-        conguideEn: conguideEnElement.value,
-        venue: {
-            venueId: venueIdElement.value,
-        },
-        warnings: selectedWarnings // Include updated warnings
+        eventId: document.getElementById('eventId').value,
+        title: document.getElementById('title').value,
+        eventCreator: document.getElementById('eventCreator').value,
+        eventResponsible: document.getElementById('eventResponsible').value,
+        eventControl: document.getElementById('eventControl').value,
+        eventType: document.getElementById('eventType').value,
+        description: document.getElementById('description').value,
+        maxParticipants: document.getElementById('maxParticipants').value,
+        maxAudience: document.getElementById('maxAudience').value,
+        conguideDk: document.getElementById('conguideDk').value,
+        conguideEn: document.getElementById('conguideEn').value,
+        warnings: Array.from(document.querySelectorAll('input[name="warnings"]:checked'))
+            .map(checkbox => checkbox.value).join(','),
+        eventRoomId: document.getElementById('eventRoomId').value // Include eventRoomId
     };
 
     try {
-        const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
+        const response = await fetch(`http://localhost:3000/api/events/${updatedEvent.eventId}`, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedEvent)
         });
 
-        if (!response.ok) {
-            const errorMessage = await response.text();
-            console.error('Error:', errorMessage);
-            throw new Error('Failed to update event: ' + errorMessage);
+        if (response.ok) {
+            alert('Event updated successfully');
+            fetchEventDetails(updatedEvent.eventId); // Refresh updated details
+        } else {
+            throw new Error('Failed to update event');
         }
-        alert('Event updated successfully');
-        fetchEventDetails(eventId); // Fetch and display the updated event details
     } catch (error) {
         console.error('Error:', error);
+        alert('An error occurred while updating the event.');
     }
 }
+
 
 document.getElementById('updateEventForm').addEventListener('submit', updateEvent);
 

@@ -1,13 +1,15 @@
 CREATE DATABASE IF NOT EXISTS eventDatabase;
 USE eventDatabase;
 
-
+ALTER TABLE venue ADD FOREIGN KEY (event_room_id) REFERENCES EventRoom(event_room_id) ON DELETE SET NULL;
 
 -- Venue Table
 CREATE TABLE IF NOT EXISTS venue (
                                      venue_id INT AUTO_INCREMENT PRIMARY KEY,
                                      venue_name VARCHAR(50) NOT NULL,
-                                     venue_address VARCHAR(50) NOT NULL
+                                     venue_address VARCHAR(50) NOT NULL,
+                                    event_room_id INT DEFAULT NULL,
+                                 FOREIGN KEY (event_room_id) REFERENCES EventRoom(event_room_id) ON DELETE SET NULL
 );
 
 -- Event Room Table

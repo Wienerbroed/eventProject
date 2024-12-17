@@ -45,42 +45,90 @@
   <label for="conguideEn">Guide (EN):</label>
   <textarea id="conguideEn" name="conguideEn" required></textarea><br><br>
 
-    <label>Warnings:</label><br>
-    <input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
-    <label for="wheelchair">Wheelchair Accessible</label><br>
-    <input type="checkbox" id="strobelights" name="warnings" value="strobelights">
-    <label for="strobelights">Strobelights</label><br>
-    <input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
-    <label for="loudNoises">Loud Noises</label><br><br>
+
+
+  <label for="venueSelect">Venue:</label>
+  <select id="venueSelect" name="venueSelect">
+    <option value="">-- Select a Venue --</option>
+  </select>
 
   <label for="eventRoomSelect">Event Room:</label>
-  <select id="eventRoomSelect" name="eventRoomSelect" required>
-    <!-- Event rooms will be dynamically populated here -->
+  <select id="eventRoomSelect" name="eventRoomSelect">
+    <option value="">-- Select an Event Room --</option>
   </select>
+
+
 
   <button type="submit">Add Event</button>
 </form>
 
+<label>Warnings:</label><br>
+<input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
+<label for="wheelchair">Wheelchair Accessible</label><br>
+<input type="checkbox" id="strobelights" name="warnings" value="strobelights">
+<label for="strobelights">Strobelights</label><br>
+<input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
+<label for="loudNoises">Loud Noises</label><br><br>
 <script>
   // Function to populate event rooms dynamically
-  async function populateEventRoomDropdown() {
+  async function populateVenueDropdown() {
     try {
-      const response = await fetch('http://localhost:3000/api/eventrooms'); // Updated API endpoint for Event Rooms
-      if (!response.ok) throw new Error('Failed to fetch event rooms');
+      const response = await fetch('http://localhost:3000/api/venues');
+      if (!response.ok) throw new Error('Failed to fetch venues');
 
-      const eventRooms = await response.json();
-      const eventRoomSelect = document.getElementById('eventRoomSelect');
-
-      eventRooms.forEach(eventRoom => {
+      const venues = await response.json();
+      const venueSelect = document.getElementById('venueSelect');
+      venues.forEach(venue => {
         const option = document.createElement('option');
-        option.value = eventRoom.eventRoomId; // Use eventRoomId as the value
-        option.textContent = eventRoom.eventRoomName; // Display eventRoomName
-        eventRoomSelect.appendChild(option);
+        option.value = venue.venueId; // Use venue ID as value
+        option.textContent = venue.venueName; // Display venue name
+        venueSelect.appendChild(option);
       });
     } catch (error) {
-      console.error('Error fetching event rooms:', error);
+      console.error('Error fetching venues:', error);
     }
   }
+
+
+  // Add event listener for Venue dropdown change
+  document.getElementById('venueSelect').addEventListener('change', async function() {
+    const selectedVenueId = this.value; // Get the selected venue ID
+    console.log('Selected Venue ID:', selectedVenueId);
+
+    const eventRoomSelect = document.getElementById('eventRoomSelect');
+    eventRoomSelect.innerHTML = '<option value="">-- Select an Event Room --</option>'; // Reset options
+
+    if (selectedVenueId) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/eventrooms/venue/${selectedVenueId}`);
+        const eventRooms = await response.json();
+
+        console.log('Fetched Event Rooms:', eventRooms);
+
+        if (eventRooms.length > 0) {
+          eventRooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room.eventRoomId;
+            option.textContent = room.eventRoomName;
+            eventRoomSelect.appendChild(option);
+          });
+        } else {
+          console.warn('No event rooms found for the selected venue.');
+        }
+      } catch (error) {
+        console.error('Error fetching event rooms:', error);
+        alert('Failed to fetch event rooms.');
+      }
+    }
+  });
+
+
+
+
+
+  // Load venues on page load
+  document.addEventListener('DOMContentLoaded', populateVenueDropdown);
+
 
   // Logout function
   async function logout() {
@@ -102,11 +150,11 @@
 
   // Form submission logic
   document.getElementById('addEventForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent default form submission
 
     const warnings = Array.from(document.querySelectorAll('input[name="warnings"]:checked'))
-                          .map(checkbox => checkbox.value)
-                          .join(',');
+            .map(checkbox => checkbox.value)
+            .join(',');
 
     const eventData = {
       title: document.getElementById('title').value,
@@ -136,13 +184,15 @@
         alert('Event added successfully!');
         window.location.href = 'event.html'; // Redirect to events page
       } else {
-        alert('Failed to add event.');
+        const errorText = await response.text();
+        alert('Failed to add event: ' + errorText);
       }
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred.');
     }
   });
+
 </script>
 </body>
 </html>

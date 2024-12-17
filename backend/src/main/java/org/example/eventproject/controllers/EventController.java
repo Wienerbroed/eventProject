@@ -1,14 +1,11 @@
 package org.example.eventproject.controllers;
 
-import org.example.eventproject.models.EventSchedule;
-import org.example.eventproject.models.Events;
+import org.example.eventproject.models.*;
 import org.example.eventproject.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.example.eventproject.models.EventExpenses;
-import org.example.eventproject.models.EventRequirements;
 
 
 import java.util.Collections;
@@ -33,6 +30,13 @@ public class EventController {
         List<Events> events = eventService.getAllEventsWithEventRoomDetails();
         return ResponseEntity.ok(events);
     }
+
+    @GetMapping("/byVenueName")
+    public List<EventRoom> getEventRoomsByVenueName(@RequestParam String venueName) {
+        return eventService.findEventRoomsByVenueId(venueName);
+    }
+
+
 
 
     // Add Event

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,11 +70,14 @@ public class EventRoomController {
     }
 
     @GetMapping("/venue/{venueId}")
-    public ResponseEntity<List<EventRoom>> getEventRoomsByVenueId(long venueId) {
-        List<EventRoom> eventRooms = eventRoomService.getEventRoomsByVenueId(venueId);
-        if (eventRooms.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<List<EventRoom>> getEventRoomsByVenueId(@PathVariable("venueId") Long venueId) {
+        if (venueId == null) {
+            return ResponseEntity.badRequest().body(Collections.emptyList());
         }
-        return ResponseEntity.ok(eventRooms);
+
+        List<EventRoom> eventRooms = eventRoomService.getEventRoomsByVenueId(venueId);
+        return ResponseEntity.ok(eventRooms != null ? eventRooms : Collections.emptyList());
     }
+
+
 }

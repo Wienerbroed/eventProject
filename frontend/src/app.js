@@ -46,6 +46,38 @@ const authenticateToken = (req, res, next) => {
 };
 
 
+
+// Fetch event rooms filtered by venueId or venueName
+app.get('/api/eventrooms/filter', async (req, res) => {
+    const { venueId, venueName } = req.query;
+
+    let queryUrl = 'http://localhost:8080/api/eventrooms';
+
+    // Adjust query parameters for backend filtering
+    if (venueId) {
+        queryUrl += `?venueId=${venueId}`;
+    } else if (venueName) {
+        queryUrl += `?venueName=${encodeURIComponent(venueName)}`;
+    }
+
+    try {
+        const response = await fetch(queryUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch event rooms: ${response.statusText}`);
+        }
+
+        const eventRooms = await response.json();
+        res.json(eventRooms);
+    } catch (error) {
+        console.error('Error fetching event rooms:', error.message);
+        res.status(500).send('Error fetching event rooms: ' + error.message);
+    }
+});
+
+
+
+
+
 // ---------- Event Routes ----------
 
 
@@ -271,26 +303,21 @@ app.post('/api/events/addSchedule/:eventId', async (req, res) => {
 
 
 // Fetch events by venue ID
-app.get('/api/events/venue/:venueId', async (req, res) => {
+app.get('/api/eventrooms/venue/:venueId', async (req, res) => {
     const venueId = req.params.venueId;
 
     try {
-        const response = await fetch(`http://localhost:8080/api/events/venue/${venueId}`);
+        const response = await fetch(`http://localhost:8080/api/eventrooms/venue/${venueId}`);
+        const eventRooms = await response.json();
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch events for venue ${venueId}: ${response.statusText}`);
+        if (!Array.isArray(eventRooms)) {
+            return res.status(200).json([]); // Always return an array
         }
 
-        const events = await response.json();
-
-        if (!Array.isArray(events)) {
-            throw new Error('Received invalid data format. Expected an array of events.');
-        }
-
-        res.json(events); // Return the events in the response
+        res.json(eventRooms);
     } catch (error) {
-        console.error('Error fetching events by venue:', error.message);
-        res.status(500).send('Error fetching events by venue: ' + error.message); // Return a server error response
+        console.error('Error fetching event rooms:', error.message);
+        res.status(500).send('Error fetching event rooms: ' + error.message);
     }
 });
 
