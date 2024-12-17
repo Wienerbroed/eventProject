@@ -177,7 +177,7 @@ app.post('/api/events/add', async (req, res) => {
         const postResponse = await fetch('http://localhost:8080/api/events/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(eventData),
+            body: JSON.stringify(eventData)
         });
 
         if (postResponse.ok) {
@@ -186,9 +186,11 @@ app.post('/api/events/add', async (req, res) => {
             res.status(postResponse.status).send('Failed to add Event: ' + postResponse.statusText);
         }
     } catch (error) {
-        res.status(500).send('Error adding event: ' + error.message);
+        res.status(500).send('Error adding activity: ' + error.message);
     }
 });
+
+
 
 // Delete an event
 app.delete('/api/events/:id', async (req, res) => {

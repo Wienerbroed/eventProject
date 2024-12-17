@@ -14,7 +14,8 @@
   <button class="calender-btn" onclick="window.location.href='eventCalender.html'">Go to Calendar</button>
 </header>
 
-<form id="addEventForm">
+<form id="addEventForm" method="POST">
+
   <label for="title">Event Title:</label>
   <input type="text" id="title" name="title" required><br><br>
 
@@ -45,7 +46,13 @@
   <label for="conguideEn">Guide (EN):</label>
   <textarea id="conguideEn" name="conguideEn" required></textarea><br><br>
 
-
+    <label>Warnings:</label><br>
+    <input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
+    <label for="wheelchair">Wheelchair Accessible</label><br>
+    <input type="checkbox" id="strobelights" name="warnings" value="strobelights">
+    <label for="strobelights">Strobelights</label><br>
+    <input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
+    <label for="loudNoises">Loud Noises</label><br><br>
 
   <label for="venueSelect">Venue:</label>
   <select id="venueSelect" name="venueSelect">
@@ -62,13 +69,6 @@
   <button type="submit">Add Event</button>
 </form>
 
-<label>Warnings:</label><br>
-<input type="checkbox" id="wheelchair" name="warnings" value="wheelchair">
-<label for="wheelchair">Wheelchair Accessible</label><br>
-<input type="checkbox" id="strobelights" name="warnings" value="strobelights">
-<label for="strobelights">Strobelights</label><br>
-<input type="checkbox" id="loudNoises" name="warnings" value="loud noises">
-<label for="loudNoises">Loud Noises</label><br><br>
 <script>
   // Function to populate event rooms dynamically
   async function populateVenueDropdown() {
@@ -146,16 +146,15 @@
   }
 
   // Call the function on page load
-  document.addEventListener('DOMContentLoaded', populateEventRoomDropdown);
-
-  // Form submission logic
   document.getElementById('addEventForm').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); // Stop form from refreshing the page.
 
+    // Collect warnings checkboxes
     const warnings = Array.from(document.querySelectorAll('input[name="warnings"]:checked'))
             .map(checkbox => checkbox.value)
             .join(',');
 
+    // Prepare form data
     const eventData = {
       title: document.getElementById('title').value,
       eventCreator: document.getElementById('eventCreator').value,
@@ -171,18 +170,17 @@
       eventRoomId: document.getElementById('eventRoomSelect').value
     };
 
+    // Send data using POST method
     try {
       const response = await fetch('http://localhost:3000/api/events/add', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData)
       });
 
       if (response.ok) {
         alert('Event added successfully!');
-        window.location.href = 'event.html'; // Redirect to events page
+        window.location.href = 'event.html'; // Redirect after success
       } else {
         const errorText = await response.text();
         alert('Failed to add event: ' + errorText);
@@ -192,6 +190,7 @@
       alert('An error occurred.');
     }
   });
+
 
 </script>
 </body>
