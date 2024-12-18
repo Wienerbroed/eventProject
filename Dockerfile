@@ -14,7 +14,7 @@ RUN npm install
 COPY frontend/src ./src
 
 # Expose the port your app listens on
-EXPOSE 8080
+EXPOSE 3000
 
 # Run the JavaScript app
 CMD ["node", "src/app.js"]
