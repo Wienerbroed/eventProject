@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up JDK
-        uses: actions/setup-java@7a6d8a8
+        uses: actions/setup-java@2dfa2011c5b2a0f1
         with:
           java-version: "21"
           distribution: "temurin"
