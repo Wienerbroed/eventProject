@@ -34,6 +34,6 @@ jobs:
             maven-${{ runner.os }}-
 
       - name: Run tests
-        working-directory: ./backend/test
+        working-directory: ./backend
         run: |
           mvn clean test
