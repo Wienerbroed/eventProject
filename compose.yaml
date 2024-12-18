@@ -1,0 +1,36 @@
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: asdf1234
+      MYSQL_DATABASE: eventDatabase
+
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+
+
+
+  app:
+    build:
+      context: .           # Build context is the project root
+      dockerfile: Dockerfile # Dockerfile in root directory
+    container_name: js_app_container
+    ports:
+      - "3000:3000"        # Map host port 3000 to container port 8080
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: asdf1234
+      DB_NAME: eventDatabase
+
+
+
+
+volumes:
+  mysql_data:
