@@ -3,10 +3,10 @@ name: eventProject
 on:
   push:
     branches:
-      - "Main-new2.0"
+      - "master"
   pull_request:
     branches:
-      - "Main-new2.0"
+      - "master"
   workflow_dispatch:
 
 
