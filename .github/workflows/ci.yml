@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@7a6d8a8
         with:
           java-version: "21"
           distribution: "temurin"
@@ -35,6 +35,6 @@ jobs:
             maven-${{ runner.os }}-
 
       - name: Run tests
-        working-directory: ./
+        working-directory: ./backend/test
         run: |
           mvn clean test
