@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("h2")
 @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:h2init.sql")
 public class EventRepositoryH2Test {
-//a
     @Autowired
     private EventRepository repository;
 
