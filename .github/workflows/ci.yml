@@ -35,5 +35,5 @@ jobs:
 
 
       - name: Run tests
-        working-directory: ./backend
+        working-directory: .
         run: mvn clean test
