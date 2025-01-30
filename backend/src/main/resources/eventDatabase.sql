@@ -2,6 +2,8 @@ CREATE DATABASE IF NOT EXISTS eventDatabase;
 USE eventDatabase;
 
 
+
+
 -- Venue Table
 CREATE TABLE IF NOT EXISTS venue (
                                      venue_id INT AUTO_INCREMENT PRIMARY KEY,
